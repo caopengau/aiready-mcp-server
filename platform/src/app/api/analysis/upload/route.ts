@@ -76,9 +76,10 @@ export async function POST(request: NextRequest) {
     let targetRepoId = repoId;
 
     // 3. Infer repoId from Git URL if not provided
-    if (!targetRepoId && data.repository?.url) {
+    const incomingRepoUrl = data.metadata?.repository || (data as any).repository?.url;
+    if (!targetRepoId && incomingRepoUrl) {
       const userRepos = await listUserRepositories(userId);
-      const normalizedUrl = data.repository.url.replace(/\.git$/, '');
+      const normalizedUrl = incomingRepoUrl.replace(/\.git$/, '');
       const match = userRepos.find(
         (r) =>
           r.url.replace(/\.git$/, '') === normalizedUrl ||
