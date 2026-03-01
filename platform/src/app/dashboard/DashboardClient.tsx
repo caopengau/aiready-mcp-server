@@ -5,13 +5,14 @@ import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RocketIcon } from '@/components/Icons';
+import { useEffect } from 'react';
 import {
   scoreColor,
   scoreBg,
   scoreGlow,
   scoreLabel,
 } from '@aiready/components';
-import type { Repository, Analysis } from '@/lib/db';
+import type { Repository, Analysis, ApiKey } from '@/lib/db';
 
 type RepoWithAnalysis = Repository & { latestAnalysis: Analysis | null };
 
@@ -43,6 +44,59 @@ export default function DashboardClient({
   const [addRepoLoading, setAddRepoLoading] = useState(false);
   const [uploadingRepoId, setUploadingRepoId] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [newKeyName, setNewKeyName] = useState('');
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
+  const [keysLoading, setKeysLoading] = useState(false);
+
+  useEffect(() => {
+    fetchApiKeys();
+  }, []);
+
+  async function fetchApiKeys() {
+    try {
+      const res = await fetch('/api/keys');
+      const data = await res.json();
+      if (res.ok) setApiKeys(data.keys);
+    } catch (err) {
+      console.error('Failed to fetch API keys:', err);
+    }
+  }
+
+  async function handleCreateKey(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newKeyName) return;
+    setKeysLoading(true);
+    try {
+      const res = await fetch('/api/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newKeyName }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setNewlyCreatedKey(data.key);
+        setNewKeyName('');
+        fetchApiKeys();
+      }
+    } catch (err) {
+      console.error('Failed to create API key:', err);
+    } finally {
+      setKeysLoading(false);
+    }
+  }
+
+  async function handleDeleteKey(id: string) {
+    if (!confirm('Delete this API key?')) return;
+    try {
+      const res = await fetch(`/api/keys?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setApiKeys((prev) => prev.filter((k) => k.id !== id));
+      }
+    } catch (err) {
+      console.error('Failed to delete API key:', err);
+    }
+  }
 
   async function handleAddRepo(e: React.FormEvent) {
     e.preventDefault();
@@ -403,7 +457,124 @@ export default function DashboardClient({
             </div>
           </motion.section>
         )}
+
+        {/* API Keys section */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-white">API Keys</h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 glass-card rounded-2xl p-6 h-fit">
+              <h3 className="text-sm font-semibold text-white mb-4">
+                Create New Key
+              </h3>
+              <form onSubmit={handleCreateKey} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="e.g., GitHub Actions"
+                  value={newKeyName}
+                  onChange={(e) => setNewKeyName(e.target.value)}
+                  className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={keysLoading}
+                  className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg border border-slate-700 transition-colors disabled:opacity-50"
+                >
+                  {keysLoading ? 'Generating...' : 'Generate New Key'}
+                </button>
+              </form>
+            </div>
+
+            <div className="lg:col-span-2 glass-card rounded-2xl overflow-hidden border border-indigo-500/10">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="bg-slate-800/50 text-slate-400 border-b border-slate-700/50">
+                    <th className="px-6 py-3 font-medium">Name</th>
+                    <th className="px-6 py-3 font-medium">Key</th>
+                    <th className="px-6 py-3 font-medium">Created</th>
+                    <th className="px-6 py-3 font-medium text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/30">
+                  {apiKeys.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-8 text-center text-slate-500 italic">
+                        No API keys yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    apiKeys.map((key) => (
+                      <tr key={key.id} className="hover:bg-slate-800/20 transition-colors">
+                        <td className="px-6 py-4 text-white font-medium">{key.name}</td>
+                        <td className="px-6 py-4 font-mono text-cyan-400">{key.prefix}</td>
+                        <td className="px-6 py-4 text-slate-400">
+                          {new Date(key.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => handleDeleteKey(key.id)}
+                            className="text-slate-500 hover:text-red-400 transition-colors"
+                          >
+                            Revoke
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* New Key Modal */}
+      <AnimatePresence>
+        {newlyCreatedKey && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60] p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="glass-card rounded-2xl p-8 max-w-md w-full border border-cyan-500/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.5)]"
+            >
+              <h3 className="text-xl font-bold text-white mb-2">New API Key Created</h3>
+              <p className="text-slate-400 text-sm mb-6">
+                Please copy your API key now. For security reasons, it will only be shown once.
+              </p>
+              
+              <div className="bg-black/40 border border-cyan-500/20 rounded-xl p-4 flex items-center justify-between gap-3 mb-8">
+                <code className="text-cyan-400 font-mono text-lg break-all">{newlyCreatedKey}</code>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(newlyCreatedKey);
+                    alert('Copied to clipboard!');
+                  }}
+                  className="bg-cyan-500/10 hover:bg-cyan-500/20 p-2 rounded-lg text-cyan-400 border border-cyan-500/20"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                </button>
+              </div>
+
+              <button
+                onClick={() => setNewlyCreatedKey(null)}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl shadow-lg hover:shadow-cyan-500/20 transition-all"
+              >
+                I've secured the key
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Add Repository Modal */}
       <AnimatePresence>

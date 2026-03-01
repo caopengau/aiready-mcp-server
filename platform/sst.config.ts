@@ -110,7 +110,10 @@ export default $config({
       };
     }
 
-    const site = new sst.aws.Nextjs('Dashboard', siteConfig);
+    const site = new sst.aws.Nextjs('Dashboard', {
+      ...siteConfig,
+      link: [table, bucket],
+    });
 
     return {
       site: site.url,

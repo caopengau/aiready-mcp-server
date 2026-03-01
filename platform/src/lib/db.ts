@@ -24,6 +24,7 @@
  *   GSI2SK: <timestamp>
  */
 
+import { createHash, randomBytes } from 'node:crypto';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
@@ -147,6 +148,16 @@ export interface MagicLinkToken {
   expiresAt: string;
   used: boolean;
   createdAt: string;
+}
+
+export interface ApiKey {
+  id: string; // Internal ID
+  userId: string;
+  name: string; // e.g., "GitHub Actions"
+  keyHash: string; // SHA-256 hash of the full key
+  prefix: string; // e.g., "ar_1234..."
+  createdAt: string;
+  lastUsedAt?: string;
 }
 
 // User operations
@@ -734,3 +745,140 @@ export async function markMagicLinkUsed(token: string): Promise<void> {
 }
 
 export { doc, TABLE_NAME };
+// API Key operations
+
+/**
+ * Generate a new API key and store its hash
+ * Returns the plain text key. THIS IS THE ONLY TIME THE PLAIN TEXT KEY IS AVAILABLE.
+ */
+export async function createApiKey(
+  userId: string,
+  name: string
+): Promise<{ id: string; key: string }> {
+  const id = crypto.randomUUID();
+  const keyBody = randomBytes(24).toString('hex');
+  const plainKey = `ar_${keyBody}`;
+  const keyHash = createHash('sha256').update(plainKey).digest('hex');
+  const prefix = `${plainKey.substring(0, 7)}...`;
+
+  const apiKey: ApiKey = {
+    id,
+    userId,
+    name,
+    keyHash,
+    prefix,
+    createdAt: new Date().toISOString(),
+  };
+
+  // Store two items:
+  // 1. For user management (list/delete): PK=USER#<userId>, SK=APIKEY#<id>
+  // 2. For validation (lookup): PK=APIKEY#<hash>, SK=#METADATA
+  await doc.send(
+    new BatchWriteCommand({
+      RequestItems: {
+        [TABLE_NAME]: [
+          {
+            PutRequest: {
+              Item: {
+                PK: `USER#${userId}`,
+                SK: `APIKEY#${id}`,
+                GSI1PK: `USER#${userId}`,
+                GSI1SK: `APIKEY#${id}`,
+                type: 'APIKEY',
+                ...apiKey,
+              },
+            },
+          },
+          {
+            PutRequest: {
+              Item: {
+                PK: `APIKEY#${keyHash}`,
+                SK: '#METADATA',
+                type: 'APIKEY_HASH',
+                apiKeyId: id,
+                userId: userId,
+              },
+            },
+          },
+        ],
+      },
+    })
+  );
+
+  return { id, key: plainKey };
+}
+
+export async function listUserApiKeys(userId: string): Promise<ApiKey[]> {
+  const result = await doc.send(
+    new QueryCommand({
+      TableName: TABLE_NAME,
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': `USER#${userId}`,
+        ':sk': 'APIKEY#',
+      },
+    })
+  );
+
+  return (result.Items || []) as ApiKey[];
+}
+
+export async function deleteApiKey(userId: string, id: string): Promise<void> {
+  // We need the hash to delete both records. Get the item first.
+  const item = await doc.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `USER#${userId}`, SK: `APIKEY#${id}` },
+    })
+  );
+
+  if (!item.Item) return;
+
+  const keyHash = (item.Item as ApiKey).keyHash;
+
+  await doc.send(
+    new BatchWriteCommand({
+      RequestItems: {
+        [TABLE_NAME]: [
+          { DeleteRequest: { Key: { PK: `USER#${userId}`, SK: `APIKEY#${id}` } } },
+          { DeleteRequest: { Key: { PK: `APIKEY#${keyHash}`, SK: '#METADATA' } } },
+        ],
+      },
+    })
+  );
+}
+
+/**
+ * Validate an API key and return the associated user ID
+ */
+export async function validateApiKey(
+  plainKey: string
+): Promise<{ userId: string; apiKeyId: string } | null> {
+  const keyHash = createHash('sha256').update(plainKey).digest('hex');
+
+  const result = await doc.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `APIKEY#${keyHash}`, SK: '#METADATA' },
+    })
+  );
+
+  if (!result.Item) return null;
+
+  // Update lastUsedAt asynchronously
+  const userId = result.Item.userId;
+  const apiKeyId = result.Item.apiKeyId;
+
+  doc
+    .send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `USER#${userId}`, SK: `APIKEY#${apiKeyId}` },
+        UpdateExpression: 'SET lastUsedAt = :t',
+        ExpressionAttributeValues: { ':t': new Date().toISOString() },
+      })
+    )
+    .catch((err) => console.error('Error updating lastUsedAt:', err));
+
+  return { userId, apiKeyId };
+}

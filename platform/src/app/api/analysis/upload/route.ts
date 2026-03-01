@@ -5,6 +5,8 @@ import {
   getRepository,
   listRepositoryAnalyses,
   getUser,
+  validateApiKey,
+  listUserRepositories,
 } from '@/lib/db';
 import {
   storeAnalysis,
@@ -21,15 +23,9 @@ import { randomUUID } from 'crypto';
 async function getRunsThisMonth(userId: string): Promise<number> {
   // Get current month's start date
   const now = new Date();
-  const monthStart = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    1
-  ).toISOString();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
   // Query all user's repos and count analyses this month
-  // For now, we'll use a simple approach - in production, use a metric record
-  const { listUserRepositories } = await import('@/lib/db');
   const repos = await listUserRepositories(userId);
 
   let totalRuns = 0;
@@ -45,23 +41,66 @@ async function getRunsThisMonth(userId: string): Promise<number> {
 // POST /api/analysis/upload - Upload analysis results
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    let userId: string | undefined;
+
+    // 1. Check for API key (Authorization: Bearer <key>)
+    const authHeader = request.headers.get('Authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const apiKey = authHeader.substring(7);
+      const validation = await validateApiKey(apiKey);
+      if (validation) {
+        userId = validation.userId;
+      }
+    }
+
+    // 2. Fallback to session
+    if (!userId) {
+      const session = await auth();
+      userId = session?.user?.id;
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { repoId, data } = body as { repoId: string; data: AnalysisData };
 
-    if (!repoId || !data) {
+    if (!data) {
       return NextResponse.json(
-        { error: 'Repository ID and analysis data are required' },
+        { error: 'Analysis data is required' },
+        { status: 400 }
+      );
+    }
+
+    let targetRepoId = repoId;
+
+    // 3. Infer repoId from Git URL if not provided
+    if (!targetRepoId && data.repository?.url) {
+      const userRepos = await listUserRepositories(userId);
+      const normalizedUrl = data.repository.url.replace(/\.git$/, '');
+      const match = userRepos.find(
+        (r) =>
+          r.url.replace(/\.git$/, '') === normalizedUrl ||
+          r.url === normalizedUrl
+      );
+      if (match) {
+        targetRepoId = match.id;
+      }
+    }
+
+    if (!targetRepoId) {
+      return NextResponse.json(
+        {
+          error:
+            'Repository ID is required or repository must be added to dashboard first.',
+        },
         { status: 400 }
       );
     }
 
     // Verify repository exists and belongs to user
-    const repo = await getRepository(repoId);
+    const repo = await getRepository(targetRepoId);
     if (!repo) {
       return NextResponse.json(
         { error: 'Repository not found' },
@@ -69,13 +108,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (repo.userId !== session.user.id) {
+    if (repo.userId !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Check run limit (Free tier: 10 runs/month)
-    const maxRunsPerMonth = planLimits.free.maxRunsPerMonth; // 10 runs for free tier
-    const runsThisMonth = await getRunsThisMonth(session.user.id);
+    const maxRunsPerMonth = planLimits.free.maxRunsPerMonth;
+    const runsThisMonth = await getRunsThisMonth(userId);
 
     if (runsThisMonth >= maxRunsPerMonth) {
       return NextResponse.json(
@@ -101,8 +140,8 @@ export async function POST(request: NextRequest) {
 
     // Store raw data in S3
     const rawKey = await storeAnalysis({
-      userId: session.user.id,
-      repoId,
+      userId,
+      repoId: targetRepoId,
       timestamp,
       data,
     });
@@ -113,8 +152,8 @@ export async function POST(request: NextRequest) {
     // Create analysis record in DynamoDB
     const analysis = await createAnalysis({
       id: analysisId,
-      repoId,
-      userId: session.user.id,
+      repoId: targetRepoId,
+      userId,
       timestamp,
       aiScore,
       breakdown: extractBreakdown(data),
@@ -126,8 +165,8 @@ export async function POST(request: NextRequest) {
     // Calculate remaining runs
     const remainingRuns = maxRunsPerMonth - runsThisMonth - 1;
 
-    // Send email notification (async, don't wait for it)
-    getUser(session.user.id).then((user) => {
+    // Send email notification
+    getUser(userId).then((user) => {
       if (user?.email) {
         const baseUrl =
           process.env.NEXT_PUBLIC_APP_URL || 'https://platform.getaiready.dev';
@@ -137,7 +176,7 @@ export async function POST(request: NextRequest) {
           aiScore,
           breakdown: analysis.breakdown,
           summary: analysis.summary,
-          dashboardUrl: `${baseUrl}/dashboard?repo=${repoId}`,
+          dashboardUrl: `${baseUrl}/dashboard?repo=${targetRepoId}`,
         }).catch((err) => console.error('Failed to send analysis email:', err));
       }
     });

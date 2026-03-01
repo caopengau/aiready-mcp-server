@@ -82,6 +82,7 @@ platform/
 │   │   │   ├── auth/           # NextAuth handlers
 │   │   │   ├── analysis/       # Analysis upload
 │   │   │   ├── billing/        # Stripe webhooks
+│   │   │   ├── keys/           # API key management
 │   │   │   └── repos/          # Repository management
 │   │   ├── dashboard/          # Dashboard page
 │   │   └── login/              # Login page
@@ -117,6 +118,7 @@ The `sst.config.ts` handles:
 | User     | `USER#{id}`     | `USER#{id}`            | `EMAIL#{email}` | -               |
 | Repo     | `USER#{userId}` | `REPO#{repoId}`        | `REPO#{url}`    | -               |
 | Analysis | `REPO#{repoId}` | `ANALYSIS#{timestamp}` | -               | `USER#{userId}` |
+| ApiKey   | `USER#{userId}` | `KEY#{id}`             | `HASH#{keyHash}`| -               |
 
 ### Stripe Integration
 

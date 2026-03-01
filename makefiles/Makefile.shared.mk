@@ -167,3 +167,26 @@ endef
 
 # Default silent targets for multi-line recipes that produce controlled output
 .SILENT: test test-core test-pattern-detect
+
+# Kill any process listening on a TCP port (useful when dev servers hang)
+# Usage: make clear-port PORT=8888
+
+ifndef CLEAR_PORT_DEFINED
+CLEAR_PORT_DEFINED := 1
+.PHONY: clear-port
+clear-port:
+	@PORT=$${PORT:-8888}; \
+	if command -v lsof >/dev/null 2>&1; then \
+		PID=$$(lsof -ti tcp:$$PORT 2>/dev/null || true); \
+	else \
+		PID=$$(ss -ltnp 2>/dev/null | awk -v p=$$PORT '$$4 ~ ":"p {print $$NF}' | sed -E 's/.*pid=([0-9]+).*/\1/' | head -n1 || true); \
+	fi; \
+	if [ -z "$$PID" ]; then \
+		printf '$(YELLOW)[INFO] No process found on port %s$(RESET_COLOR)\n' "$$PORT"; \
+		exit 0; \
+	else \
+		printf '$(LIGHTBLUE)[STEP] Killing process on port %s: PID=%s$(RESET_COLOR)\n' "$$PORT" "$$PID"; \
+		kill -9 $$PID 2>/dev/null || kill $$PID 2>/dev/null || true; \
+		printf '$(GREEN)[SUCCESS] Killed PID %s$(RESET_COLOR)\n' "$$PID"; \
+	fi
+endif

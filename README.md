@@ -120,6 +120,10 @@ AIReady uses a **hub-and-spoke architecture** for modularity and extensibility:
 │                    🖥️  PLATFORM (Private SaaS)                  │
 │              Human-in-the-Loop Agentic Remediation              │
 │                                                                  │
+│  • **Upload Results**: Push local scans to the cloud (FREE tier) │
+│  • **Dashboard**: Track trends, scores, and issue history        │
+│  • **API Keys**: Manage programmatic access for CI/CD            │
+│                                                                  │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐   │
 │  │  Dashboard   │  │ Remediation  │  │   Expert Network     │   │
 │  │  • Trends    │  │  • Auto-fix  │  │   • Human review     │   │
@@ -176,10 +180,14 @@ aiready patterns . --similarity 0.6
 aiready context . --max-depth 3
 
 # Get JSON output (saved to .aiready/ by default)
-aiready scan . --output json
-
 # Specify custom output path
 aiready scan . --output json --output-file custom-path.json
+
+# 🌐 Automatic platform upload
+aiready scan . --upload --api-key ar_...
+
+# 🌐 Standalone upload
+aiready upload .aiready/latest.json --api-key ar_...
 ```
 
 > **📁 Note:** All output files (JSON, HTML, Markdown) are saved to the `.aiready/` directory by default unless you specify a custom path with `--output-file`.
@@ -372,10 +380,12 @@ The open-source CLI and packages provide:
 
 On the roadmap:
 
-- **Private SaaS Platform** - Dashboard, teams, billing
-- **Automated Remediation** - AI agents that fix detected issues
-- **Human-in-the-Loop** - Expert review queue for complex fixes
-- **CI/CD Integration** - GitHub Actions, GitLab CI
+- ✅ **Live Dashboard** - View repository scores and trends
+- ✅ **CLI Uploads** - Push results directly from your terminal or CI
+- ✅ **API Key Management** - Secure programmatic access
+- 🔜 **Automated Remediation** - AI agents that fix detected issues
+- 🔜 **Human-in-the-Loop** - Expert review queue for complex fixes
+- 🔜 **CI/CD Integration** - GitHub Actions, GitLab CI
 
 See [Platform Documentation](./.github/platform/README.md) for details.
 
