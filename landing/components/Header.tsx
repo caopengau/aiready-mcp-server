@@ -36,7 +36,7 @@ export function Header() {
             />
           </motion.div>
         </Link>
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-8">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
           <Link
             href="/docs"
             className="hidden sm:block text-sm md:text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white relative group transition-colors"
@@ -52,9 +52,17 @@ export function Header() {
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 group-hover:w-full transition-all duration-300"></span>
           </Link>
           <Link
+            href="https://www.npmjs.com/package/@aiready/cli"
+            target="_blank"
+            className="hidden lg:block text-sm md:text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white relative group transition-colors"
+          >
+            <span>Unified CLI</span>
+            <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 group-hover:w-full transition-all duration-300"></span>
+          </Link>
+          <Link
             href="https://marketplace.visualstudio.com/items?itemName=pengcao.aiready"
             target="_blank"
-            className="hidden sm:block text-sm md:text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white relative group transition-colors"
+            className="hidden md:block text-sm md:text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white relative group transition-colors"
           >
             <span>VS Code</span>
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 group-hover:w-full transition-all duration-300"></span>

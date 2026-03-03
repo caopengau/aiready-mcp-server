@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 - **Total Files:** ${latest?.summary?.totalFiles || 0}
 - **Critical Issues:** ${latest?.summary?.criticalIssues || 0}
 - **Warnings:** ${latest?.summary?.warnings || 0}
-- **Context Fragmentation:** ${latest?.summary?.breakdown?.contextFragmentation || 'N/A'}
+- **Context Fragmentation:** ${latest?.breakdown?.contextFragmentation || 'N/A'}
 
 ## Top Critical Issues
 ${
@@ -55,7 +55,7 @@ ${
 }
 
 ## Recommendations
-1. ${latest?.summary?.criticalIssues > 0 ? 'Address critical context fragmentation issues first.' : 'Focus on improving naming consistency.'}
+1. ${(latest?.summary?.criticalIssues || 0) > 0 ? 'Address critical context fragmentation issues first.' : 'Focus on improving naming consistency.'}
 2. Use \`npx @aiready/cli fix\` to automatically address semantic duplicates.
     `.trim();
 

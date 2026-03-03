@@ -17,6 +17,7 @@ const imageMap: Record<string, string> = {
   'hidden-cost-import-chains': '/series-5-hidden-cost-import-chains.png',
   'visualizing-invisible': '/series-6-visualise-invisible-debt.png',
   'future-human-friendly-code': '/series-7-future-human-friendly-code.png',
+  'the-agentic-wall': '/agentic-shift-series-1.png',
 };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

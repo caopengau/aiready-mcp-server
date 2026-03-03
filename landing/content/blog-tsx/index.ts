@@ -12,8 +12,20 @@ import VisualizingInvisible from './visualizing-invisible';
 import visualizingInvisibleMeta from './visualizing-invisible.meta';
 import FutureHumanFriendlyCode from './future-human-friendly-code';
 import futureHumanFriendlyCodeMeta from './future-human-friendly-code.meta';
+import TheAgenticWall from './the-agentic-wall';
+import theAgenticWallMeta from './the-agentic-wall.meta';
 
 export const posts = [
+  {
+    slug: theAgenticWallMeta.slug,
+    title: theAgenticWallMeta.title,
+    date: theAgenticWallMeta.date,
+    excerpt: theAgenticWallMeta.excerpt,
+    author: theAgenticWallMeta.author,
+    tags: theAgenticWallMeta.tags || [],
+    readingTime: theAgenticWallMeta.readingTime,
+    Content: TheAgenticWall,
+  },
   {
     slug: futureHumanFriendlyCodeMeta.slug,
     title: futureHumanFriendlyCodeMeta.title,

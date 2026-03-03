@@ -3,10 +3,10 @@ import { getRepository } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { repoId: string } }
+  { params }: { params: Promise<{ repoId: string }> }
 ) {
   try {
-    const { repoId } = params;
+    const { repoId } = await params;
     const repo = await getRepository(repoId);
 
     if (!repo) {
