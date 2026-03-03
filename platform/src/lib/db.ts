@@ -75,6 +75,8 @@ export interface Team {
   plan: 'free' | 'pro' | 'team' | 'enterprise';
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
+  githubInstallationId?: string;
+  githubOrgName?: string;
   memberCount: number;
   repoLimit: number;
   createdAt: string;
@@ -126,6 +128,7 @@ export interface Analysis {
     criticalIssues: number;
     warnings: number;
   };
+  details?: any[];
   createdAt: string;
 }
 

@@ -29,3 +29,66 @@ export function determinePlan(session: {
   }
   return 'pro';
 }
+
+/**
+ * Create a Stripe Checkout Session for upgrading a team or user
+ */
+export async function createCheckoutSession(
+  teamId: string,
+  plan: 'pro' | 'team',
+  userEmail: string,
+  successUrl: string,
+  cancelUrl: string
+) {
+  const stripeClient = getStripe();
+  if (!stripeClient) throw new Error('Stripe not configured');
+
+  const prices: Record<string, string> = {
+    pro: process.env.STRIPE_PRICE_ID_PRO || '',
+    team: process.env.STRIPE_PRICE_ID_TEAM || '',
+  };
+
+  const session = await stripeClient.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price: prices[plan],
+        quantity: 1,
+      },
+    ],
+    mode: 'subscription',
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    customer_email: userEmail,
+    metadata: {
+      teamId,
+      plan,
+    },
+    subscription_data: {
+      metadata: {
+        teamId,
+        plan,
+      },
+    },
+  });
+
+  return session;
+}
+
+/**
+ * Create a Stripe Customer Portal Session
+ */
+export async function createPortalSession(
+  customerId: string,
+  returnUrl: string
+) {
+  const stripeClient = getStripe();
+  if (!stripeClient) throw new Error('Stripe not configured');
+
+  const session = await stripeClient.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: returnUrl,
+  });
+
+  return session;
+}

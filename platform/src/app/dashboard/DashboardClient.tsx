@@ -13,6 +13,7 @@ import {
   scoreLabel,
 } from '@aiready/components';
 import type { Repository, Analysis, ApiKey, Team, TeamMember } from '@/lib/db';
+import { TrendsView } from './TrendsView';
 
 type RepoWithAnalysis = Repository & { latestAnalysis: Analysis | null };
 
@@ -79,6 +80,11 @@ export default function DashboardClient({
   const [newKeyName, setNewKeyName] = useState('');
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
   const [keysLoading, setKeysLoading] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [repoForTrends, setRepoForTrends] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchApiKeys();
@@ -126,6 +132,57 @@ export default function DashboardClient({
       }
     } catch (err) {
       console.error('Failed to delete API key:', err);
+    }
+  }
+
+  async function handleCheckout(plan: 'pro' | 'team') {
+    try {
+      setBillingLoading(true);
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'checkout',
+          teamId: currentTeamId,
+          plan,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        setUploadError(data.error || 'Failed to start checkout');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      setUploadError('Checkout failed. Please try again.');
+    } finally {
+      setBillingLoading(false);
+    }
+  }
+
+  async function handlePortal(customerId: string) {
+    try {
+      setBillingLoading(true);
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'portal',
+          customerId,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        setUploadError(data.error || 'Failed to open portal');
+      }
+    } catch (err) {
+      console.error('Portal error:', err);
+      setUploadError('Failed to open billing portal.');
+    } finally {
+      setBillingLoading(false);
     }
   }
 
@@ -409,7 +466,9 @@ export default function DashboardClient({
               <span className="text-lg font-bold text-white">
                 {repos.length}
               </span>
-              <span className="text-xs text-slate-500">/ 3</span>
+              <span className="text-xs text-slate-500">
+                / {currentTeamId === 'personal' ? '3' : '∞'}
+              </span>
             </div>
             <div className="h-4 w-px bg-slate-700" />
             <div className="flex items-center gap-2">
@@ -417,19 +476,60 @@ export default function DashboardClient({
                 This Month
               </span>
               <span className="text-lg font-bold text-white">
-                {10 - repos.filter((r) => r.latestAnalysis).length}
+                {currentTeamId === 'personal'
+                  ? Math.max(
+                      0,
+                      10 - repos.filter((r) => r.latestAnalysis).length
+                    )
+                  : '∞'}
               </span>
               <span className="text-xs text-slate-500">runs left</span>
             </div>
           </div>
-          <div className="text-xs text-slate-500">
-            Free plan ·{' '}
-            <a
-              href="https://getaiready.dev/pricing"
-              className="text-cyan-400 hover:underline"
-            >
-              Upgrade
-            </a>
+          <div className="flex items-center gap-4">
+            <div className="text-xs text-slate-500">
+              <span className="capitalize font-semibold text-slate-300">
+                {currentTeamId === 'personal'
+                  ? 'Personal Plan'
+                  : `${teams.find((t) => t.teamId === currentTeamId)?.team.plan || 'Free'} Plan`}
+              </span>
+            </div>
+            {currentTeamId !== 'personal' && (
+              <div className="flex items-center gap-2">
+                {teams.find((t) => t.teamId === currentTeamId)?.team
+                  .stripeCustomerId ? (
+                  <button
+                    onClick={() => {
+                      const team = teams.find(
+                        (t) => t.teamId === currentTeamId
+                      )?.team;
+                      if (team?.stripeCustomerId)
+                        handlePortal(team.stripeCustomerId);
+                    }}
+                    disabled={billingLoading}
+                    className="text-xs text-cyan-400 hover:text-cyan-300 font-bold px-3 py-1 rounded-lg border border-cyan-400/30 hover:bg-cyan-400/10 transition-all"
+                  >
+                    {billingLoading ? 'Loading...' : 'Manage Billing'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout('team')}
+                    disabled={billingLoading}
+                    className="text-xs bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-3 py-1 rounded-lg shadow-lg shadow-cyan-500/20 transition-all disabled:opacity-50"
+                  >
+                    {billingLoading ? 'Loading...' : 'Upgrade'}
+                  </button>
+                )}
+              </div>
+            )}
+            {currentTeamId === 'personal' && (
+              <a
+                href="#pricing"
+                className="text-xs text-cyan-400 hover:underline font-bold"
+              >
+                Pricing
+              </a>
+            )}
           </div>
         </motion.div>
 
@@ -511,12 +611,28 @@ export default function DashboardClient({
                     onUpload={() => handleUploadAnalysis(repo.id)}
                     onScan={() => handleScanRepo(repo.id)}
                     onDelete={() => handleDeleteRepo(repo.id)}
+                    onViewTrends={() =>
+                      setRepoForTrends({ id: repo.id, name: repo.name })
+                    }
                   />
                 ))}
               </AnimatePresence>
             </div>
           )}
         </section>
+
+        {/* Trends Modal */}
+        <AnimatePresence>
+          {repoForTrends && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <TrendsView
+                repoId={repoForTrends.id}
+                repoName={repoForTrends.name}
+                onClose={() => setRepoForTrends(null)}
+              />
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* CLI quickstart */}
         {repos.length > 0 && repos.every((r) => !r.latestAnalysis) && (
@@ -836,6 +952,7 @@ function RepoCard({
   onUpload,
   onScan,
   onDelete,
+  onViewTrends,
 }: {
   repo: RepoWithAnalysis;
   index: number;
@@ -844,6 +961,7 @@ function RepoCard({
   onUpload: () => void;
   onScan: () => void;
   onDelete: () => void;
+  onViewTrends: () => void;
 }) {
   const score = repo.aiScore;
   const analysis = repo.latestAnalysis;
@@ -947,6 +1065,20 @@ function RepoCard({
         >
           {uploading ? 'Uploading...' : 'Upload JSON'}
         </motion.button>
+        <button
+          onClick={() => window.open(`/api/agent/metadata?repoId=${repo.id}`)}
+          className="px-3 py-2.5 bg-slate-800 text-slate-400 text-xs font-medium rounded-lg hover:bg-slate-700 hover:text-white transition-colors border border-slate-700"
+          title="Download ai-ready.json"
+        >
+          📄
+        </button>
+        <button
+          onClick={onViewTrends}
+          className="px-3 py-2.5 bg-slate-800 text-slate-400 text-xs font-medium rounded-lg hover:bg-slate-700 hover:text-white transition-colors border border-slate-700"
+          title="View Trends"
+        >
+          📈
+        </button>
         <button
           onClick={onDelete}
           className="px-3 py-2.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 text-xs font-medium rounded-lg transition-colors border border-transparent hover:border-red-500/30"

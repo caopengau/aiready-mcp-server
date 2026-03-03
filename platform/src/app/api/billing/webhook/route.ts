@@ -62,12 +62,34 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        // Handle subscription updates
+        const subscription = event.data.object as Stripe.Subscription;
+        const teamId = subscription.metadata.teamId;
+        const plan = subscription.metadata.plan as 'pro' | 'team';
+
+        if (teamId && plan) {
+          await updateTeam(teamId, {
+            plan,
+            stripeSubscriptionId: subscription.id,
+            stripeCustomerId: subscription.customer as string,
+          });
+          console.log(`Team ${teamId} subscription updated to ${plan}`);
+        }
         break;
       }
 
       case 'customer.subscription.deleted': {
-        // Downgrade to free plan when subscription is cancelled
+        const subscription = event.data.object as Stripe.Subscription;
+        const teamId = subscription.metadata.teamId;
+
+        if (teamId) {
+          await updateTeam(teamId, {
+            plan: 'free',
+            stripeSubscriptionId: undefined, // Clear subscription ID
+          });
+          console.log(
+            `Team ${teamId} subscription deleted, downgraded to free`
+          );
+        }
         break;
       }
 
