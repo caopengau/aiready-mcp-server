@@ -16,6 +16,7 @@ import {
   ListObjectsV2Command,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { ToolName, FRIENDLY_TOOL_NAMES } from '@aiready/core';
 
 // Initialize S3 client
 const s3 = new S3Client({ region: process.env.AWS_REGION || 'ap-southeast-2' });
@@ -49,80 +50,14 @@ export interface AnalysisData {
     criticalIssues: number;
     warnings: number;
   };
-  breakdown: {
-    semanticDuplicates: {
+  breakdown: Record<
+    string,
+    {
       score: number;
       count: number;
-      details: Array<{
-        type: string;
-        file1: string;
-        file2: string;
-        similarity: number;
-      }>;
-    };
-    contextFragmentation: {
-      score: number;
-      chains: Array<{
-        file: string;
-        chainLength: number;
-        contextCost: number;
-      }>;
-    };
-    namingConsistency: {
-      score: number;
-      inconsistencies: Array<{
-        type: string;
-        expected: string;
-        actual: string;
-        file: string;
-      }>;
-    };
-    documentationHealth: {
-      score: number;
-      missingDocs: string[];
-      outdatedDocs: string[];
-    };
-    dependencyHealth: {
-      score: number;
-      issues: any[];
-    };
-    aiSignalClarity: {
-      score: number;
-      signals: any[];
-    };
-    agentGrounding: {
-      score: number;
-      issues: any[];
-    };
-    testabilityIndex: {
-      score: number;
-      issues: any[];
-    };
-    changeAmplification: {
-      score: number;
-      issues: any[];
-    };
-    cognitiveLoad?: {
-      score: number;
-      factors: any[];
-    };
-    patternEntropy?: {
-      score: number;
-      recommendations: string[];
-    };
-    conceptCohesion?: {
-      score: number;
-      analysis: any;
-    };
-    docDrift?: {
-      score: number;
-      issues: any[];
-    };
-    semanticDistance?: {
-      score: number;
-      relationship: string;
-    };
-  };
+      details: any[];
+    }
+  >;
   rawOutput?: unknown;
 }
 
@@ -230,24 +165,24 @@ export async function getAnalysisDownloadUrl(
  * Calculate AI Readiness Score from analysis data
  */
 export function calculateAiScore(data: AnalysisData): number {
+  // Use scores from breakdown directly
   const b = data.breakdown || {};
 
   // Weights matching packages/core/src/scoring.ts
   const weights: Record<string, number> = {
-    semanticDuplicates: 22,
-    contextFragmentation: 19,
-    namingConsistency: 14,
-    documentationHealth: 8,
-    aiSignalClarity: 11,
-    agentGrounding: 10,
-    testabilityIndex: 10,
-    dependencyHealth: 6,
-    changeAmplification: 8,
-    cognitiveLoad: 7,
-    patternEntropy: 6,
-    conceptCohesion: 6,
-    semanticDistance: 5,
-    docDrift: 8,
+    [ToolName.PatternDetect]: 22,
+    [ToolName.ContextAnalyzer]: 19,
+    [ToolName.NamingConsistency]: 14,
+    [ToolName.AiSignalClarity]: 11,
+    [ToolName.AgentGrounding]: 10,
+    [ToolName.TestabilityIndex]: 10,
+    [ToolName.DocDrift]: 8,
+    [ToolName.DependencyHealth]: 6,
+    [ToolName.ChangeAmplification]: 8,
+    [ToolName.CognitiveLoad]: 7,
+    [ToolName.PatternEntropy]: 6,
+    [ToolName.ConceptCohesion]: 6,
+    [ToolName.SemanticDistance]: 5,
   };
 
   let weightedSum = 0;
@@ -284,49 +219,21 @@ export function extractSummary(data: AnalysisData) {
  */
 export function extractBreakdown(data: AnalysisData) {
   const b = data.breakdown || {};
-
-  const getScore = (key: string) => {
-    const val = (b as any)[key];
-    if (val === undefined || val === null) return undefined;
-    const score = typeof val === 'number' ? val : (val as any)?.score;
-    // Return if it's a valid number including 0
-    return typeof score === 'number' && score >= 0 ? score : undefined;
-  };
-
   const result: Record<string, number> = {};
 
-  // All possible breakdown keys
-  const keys = [
-    'semanticDuplicates',
-    'contextFragmentation',
-    'namingConsistency',
-    'documentationHealth',
-    'dependencyHealth',
-    'aiSignalClarity',
-    'agentGrounding',
-    'testabilityIndex',
-    'changeAmplification',
-    'cognitiveLoad',
-    'patternEntropy',
-    'conceptCohesion',
-    'semanticDistance',
-    // Fallback/Legacy keys
-    'docDrift',
-  ];
-
-  for (const key of keys) {
-    const score = getScore(key);
-    if (score !== undefined) {
-      result[key] = score;
+  for (const key of Object.values(ToolName)) {
+    const val = (b as any)[key];
+    if (val !== undefined && val !== null) {
+      const score = typeof val === 'number' ? val : (val as any).score;
+      if (typeof score === 'number' && score >= 0) {
+        result[key] = score;
+      }
     }
   }
 
   return result;
 }
 
-/**
- * Normalize raw CLI report data into AnalysisData schema
- */
 /**
  * Cleans a file path by removing absolute prefixes and common temp patterns.
  */
@@ -350,6 +257,10 @@ function cleanPath(filePath: string, rootDir?: string): string {
   return cleaned;
 }
 
+/**
+ * Normalize raw CLI report data into AnalysisData schema
+ * Enforces Canonical IDs for all tools.
+ */
 export function normalizeReport(
   raw: any,
   force = false,
@@ -375,143 +286,71 @@ export function normalizeReport(
     }
   }
 
-  // Use rawOutput if available as the source of truth for re-normalization
   const source = raw.rawOutput || raw;
   const scoring = source.scoring || {};
   const summary = source.summary || {};
   const metadata = source.metadata || {};
   const repo = metadata.repository || source.repository || {};
 
-  // Standard platform keys
-  const platformKeys = [
-    'semanticDuplicates',
-    'contextFragmentation',
-    'namingConsistency',
-    'documentationHealth',
-    'dependencyHealth',
-    'aiSignalClarity',
-    'agentGrounding',
-    'testabilityIndex',
-    'changeAmplification',
-    'cognitiveLoad',
-    'patternEntropy',
-    'conceptCohesion',
-    'semanticDistance',
-  ];
+  // Tool Legacy Mappings (For historical reports)
+  const legacyMappings: Record<string, string> = {
+    // CLI Old Shorthands
+    patterns: ToolName.PatternDetect,
+    context: ToolName.ContextAnalyzer,
+    consistency: ToolName.NamingConsistency,
+    'ai-signal': ToolName.AiSignalClarity,
+    grounding: ToolName.AgentGrounding,
+    testability: ToolName.TestabilityIndex,
+    'doc-drift': ToolName.DocDrift,
+    'deps-health': ToolName.DependencyHealth,
+    'change-amp': ToolName.ChangeAmplification,
 
-  const toolMappings: Record<string, string> = {
-    // CLI Keys -> Platform Keys
-    'pattern-detect': 'semanticDuplicates',
-    patternDetect: 'semanticDuplicates',
-    patterns: 'semanticDuplicates',
-
-    'context-analyzer': 'contextFragmentation',
-    contextAnalyzer: 'contextFragmentation',
-    context: 'contextFragmentation',
-
-    'naming-consistency': 'namingConsistency',
-    namingConsistency: 'namingConsistency',
-    'naming-conventions': 'namingConsistency',
-    consistency: 'namingConsistency',
-
-    'doc-drift': 'documentationHealth',
-    docDrift: 'documentationHealth',
-    'documentation-health': 'documentationHealth',
-    documentationHealth: 'documentationHealth',
-
-    'dependency-health': 'dependencyHealth',
-    dependencyHealth: 'dependencyHealth',
-    'deps-health': 'dependencyHealth',
-    depsHealth: 'dependencyHealth',
-
-    'ai-signal-clarity': 'aiSignalClarity',
-    aiSignalClarity: 'aiSignalClarity',
-
-    'agent-grounding': 'agentGrounding',
-    agentGrounding: 'agentGrounding',
-
-    testability: 'testabilityIndex',
-    'testability-index': 'testabilityIndex',
-    testabilityIndex: 'testabilityIndex',
-
-    'change-amplification': 'changeAmplification',
-    changeAmplification: 'changeAmplification',
-
-    'cognitive-load': 'cognitiveLoad',
-    cognitiveLoad: 'cognitiveLoad',
-    'pattern-entropy': 'patternEntropy',
-    patternEntropy: 'patternEntropy',
-    'concept-cohesion': 'conceptCohesion',
-    conceptCohesion: 'conceptCohesion',
-    'semantic-distance': 'semanticDistance',
-    semanticDistance: 'semanticDistance',
-
-    // IssueType members mapping
-    'duplicate-pattern': 'semanticDuplicates',
-    'pattern-inconsistency': 'semanticDuplicates',
-    'context-fragmentation': 'contextFragmentation',
-    'dependency-health': 'dependencyHealth',
-    'circular-dependency': 'contextFragmentation',
-    'doc-drift': 'documentationHealth',
-    'naming-inconsistency': 'namingConsistency',
-    'naming-quality': 'namingConsistency',
-    'architecture-inconsistency': 'namingConsistency',
-    'dead-code': 'aiSignalClarity',
-    'missing-types': 'agentGrounding',
-    'magic-literal': 'aiSignalClarity',
-    'boolean-trap': 'aiSignalClarity',
-    'low-testability': 'testabilityIndex',
-    'agent-navigation-failure': 'agentGrounding',
-    'ambiguous-api': 'aiSignalClarity',
-    'change-amplification': 'changeAmplification',
-    changeAmplification: 'changeAmplification',
+    // Platform Old Keys
+    semanticDuplicates: ToolName.PatternDetect,
+    contextFragmentation: ToolName.ContextAnalyzer,
+    namingConsistency: ToolName.NamingConsistency,
+    documentationHealth: ToolName.DocDrift,
+    dependencyHealth: ToolName.DependencyHealth,
+    testabilityIndex: ToolName.TestabilityIndex,
   };
 
   const breakdown: any = {};
 
-  // Initialize all platform keys with 0 score
-  platformKeys.forEach((key) => {
+  // Initialize all canonical tool keys
+  Object.values(ToolName).forEach((key) => {
     breakdown[key] = { score: 0, count: 0, details: [] };
   });
 
   // 1. First, populate scores from scoring.breakdown (Standardized source)
   if (Array.isArray(scoring.breakdown)) {
     scoring.breakdown.forEach((item: any) => {
-      const platformKey = toolMappings[item.toolName] || item.toolName;
-      if (breakdown[platformKey]) {
-        breakdown[platformKey].score = item.score || 0;
+      const canonicalId = (Object.values(ToolName) as string[]).includes(
+        item.toolName
+      )
+        ? item.toolName
+        : legacyMappings[item.toolName] || item.toolName;
+
+      if (breakdown[canonicalId]) {
+        breakdown[canonicalId].score = item.score || 0;
       }
     });
   }
 
-  // 2. Also check top-level breakdown if it exists (CLI might put scores there)
-  if (
-    source.breakdown &&
-    typeof source.breakdown === 'object' &&
-    !Array.isArray(source.breakdown)
-  ) {
-    for (const [k, v] of Object.entries(source.breakdown)) {
-      const platformKey = toolMappings[k] || k;
-      if (breakdown[platformKey]) {
-        const score = typeof v === 'number' ? v : (v as any).score;
-        if (typeof score === 'number') {
-          breakdown[platformKey].score = score;
-        }
-      }
-    }
-  }
-
-  // 3. Populate details from results array (Standardized results format)
+  // 2. Populate details from results array (New standardized results format)
   if (Array.isArray(source.results)) {
     source.results.forEach((r: any) => {
       if (r.issues && Array.isArray(r.issues)) {
         r.issues.forEach((issue: any) => {
-          // Try to map issue type to platform key
-          const platformKey =
-            toolMappings[issue.type] ||
-            toolMappings[issue.category] ||
-            'unknown';
-          if (breakdown[platformKey]) {
+          // Map issue type to canonical tool ID
+          const canonicalId = (Object.values(ToolName) as string[]).includes(
+            issue.type
+          )
+            ? issue.type
+            : legacyMappings[issue.type] ||
+              legacyMappings[issue.category] ||
+              'unknown';
+
+          if (breakdown[canonicalId]) {
             const normalized = {
               ...issue,
               location: {
@@ -519,64 +358,67 @@ export function normalizeReport(
                 file: cleanPath(issue.location?.file || r.fileName, rootDir),
               },
             };
-            breakdown[platformKey].details.push(normalized);
-            breakdown[platformKey].count++;
+            breakdown[canonicalId].details.push(normalized);
+            breakdown[canonicalId].count++;
           }
         });
       }
     });
   }
 
-  // 4. Fallback for older formats or missing results (Top-level tool objects)
-  for (const [cliName, platformKey] of Object.entries(toolMappings)) {
+  // 3. Fallback for older formats or missing results (Top-level tool objects)
+  Object.values(ToolName).forEach((toolId) => {
     // Only proceed if we don't have many details yet
-    if (breakdown[platformKey]?.count > 0) continue;
+    if (breakdown[toolId]?.count > 0) return;
 
-    const camelCased = cliName
-      .split('-')
-      .map((word: string, index: number) =>
-        index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
-      )
-      .join('');
+    // Try finding data under various possible keys (hyphenated, camelCase, legacy)
+    const possibleKeys = [
+      toolId,
+      toolId.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), // camelCase
+      Object.keys(legacyMappings).find((k) => legacyMappings[k] === toolId),
+    ].filter(Boolean) as string[];
 
-    const toolData = source[camelCased] || source[cliName];
-    if (toolData) {
-      const score = toolData.score || toolData.summary?.score || 0;
-      if (breakdown[platformKey].score === 0) {
-        breakdown[platformKey].score = score;
-      }
+    for (const key of possibleKeys) {
+      const toolData = source[key];
+      if (toolData) {
+        const score = toolData.score || toolData.summary?.score || 0;
+        if (breakdown[toolId].score === 0) {
+          breakdown[toolId].score = score;
+        }
 
-      const resultsArray =
-        toolData.results ||
-        toolData.issues ||
-        (Array.isArray(toolData) ? toolData : []);
+        const resultsArray =
+          toolData.results ||
+          toolData.issues ||
+          (Array.isArray(toolData) ? toolData : []);
 
-      if (Array.isArray(resultsArray)) {
-        resultsArray.forEach((r: any) => {
-          const normalized =
-            typeof r === 'string'
-              ? { message: r, severity: 'major' as const }
-              : { ...r };
+        if (Array.isArray(resultsArray)) {
+          resultsArray.forEach((r: any) => {
+            const normalized =
+              typeof r === 'string'
+                ? { message: r, severity: 'major' as const }
+                : { ...r };
 
-          if (normalized.location?.file) {
-            normalized.location.file = cleanPath(
-              normalized.location.file,
-              rootDir
-            );
-          } else if (normalized.file) {
-            normalized.location = {
-              ...normalized.location,
-              file: cleanPath(normalized.file, rootDir),
-            };
-          }
-          breakdown[platformKey].details.push(normalized);
-          breakdown[platformKey].count++;
-        });
+            if (normalized.location?.file) {
+              normalized.location.file = cleanPath(
+                normalized.location.file,
+                rootDir
+              );
+            } else if (normalized.file) {
+              normalized.location = {
+                ...normalized.location,
+                file: cleanPath(normalized.file, rootDir),
+              };
+            }
+            breakdown[toolId].details.push(normalized);
+            breakdown[toolId].count++;
+          });
+        }
+        break; // found it
       }
     }
-  }
+  });
 
-  // Final fallback: remove keys with no data to keep DB clean
+  // Final cleanup: remove keys with no data
   Object.keys(breakdown).forEach((key) => {
     if (
       breakdown[key].score === 0 &&

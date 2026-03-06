@@ -7,6 +7,7 @@ import {
   type ToolScoringOutput,
   type ScoringResult,
   calculateTokenBudget,
+  ToolName,
 } from '@aiready/core';
 export type { ToolScoringOutput, ScoringResult };
 
@@ -32,23 +33,29 @@ export interface UnifiedAnalysisOptions extends ScanOptions {
 }
 
 export interface UnifiedAnalysisResult {
-  // Standardized keys matching tool names
-  patternDetect?: SpokeOutput & { duplicates: any[] };
-  contextAnalyzer?: SpokeOutput;
-  consistency?: SpokeOutput;
-  docDrift?: SpokeOutput;
-  dependencyHealth?: SpokeOutput;
-  aiSignalClarity?: any;
-  agentGrounding?: any;
-  testability?: any;
-  changeAmplification?: SpokeOutput;
+  // Canonical keys matching ToolName enum members
+  [ToolName.PatternDetect]?: SpokeOutput & { duplicates: any[] };
+  [ToolName.ContextAnalyzer]?: SpokeOutput;
+  [ToolName.NamingConsistency]?: SpokeOutput;
+  [ToolName.DocDrift]?: SpokeOutput;
+  [ToolName.DependencyHealth]?: SpokeOutput;
+  [ToolName.AiSignalClarity]?: any;
+  [ToolName.AgentGrounding]?: any;
+  [ToolName.TestabilityIndex]?: any;
+  [ToolName.ChangeAmplification]?: SpokeOutput;
 
+  // Legacy/Internal metadata
   summary: {
     totalIssues: number;
     toolsRun: string[];
     executionTime: number;
   };
   scoring?: ScoringResult;
+  // Compatibility fallbacks (deprecated)
+  /** @deprecated use [ToolName.PatternDetect] */
+  patternDetect?: any;
+  /** @deprecated use [ToolName.ContextAnalyzer] */
+  contextAnalyzer?: any;
 }
 
 // Severity ordering (higher number = more severe)
@@ -114,11 +121,14 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'patterns', data: patternResult });
     }
-    result.patternDetect = {
+    const output = {
       results: sortBySeverity(patternResult.results),
       summary: patternResult.summary || {},
       duplicates: patternResult.duplicates || [],
     };
+    result[ToolName.PatternDetect] = output;
+    result.patternDetect = output; // Compatibility fallback
+
     result.summary.totalIssues += patternResult.results.reduce(
       (sum, file) => sum + file.issues.length,
       0
@@ -141,10 +151,13 @@ export async function analyzeUnified(
 
     const { generateSummary: genContextSummary } =
       await import('@aiready/context-analyzer');
-    result.contextAnalyzer = {
+    const output = {
       results: sorted,
       summary: genContextSummary(sorted),
     };
+    result[ToolName.ContextAnalyzer] = output;
+    result.contextAnalyzer = output; // Compatibility fallback
+
     result.summary.totalIssues += sorted.length;
   }
 
@@ -160,7 +173,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'consistency', data: report });
     }
-    result.consistency = {
+    result[ToolName.NamingConsistency] = {
       results: report.results ? sortBySeverity(report.results) : [],
       summary: report.summary,
     };
@@ -179,7 +192,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'doc-drift', data: report });
     }
-    result.docDrift = {
+    result[ToolName.DocDrift] = {
       results: (report as any).results || (report as any).issues || [],
       summary: report.summary || {},
     };
@@ -201,7 +214,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'deps-health', data: report });
     }
-    result.dependencyHealth = {
+    result[ToolName.DependencyHealth] = {
       results: (report as any).results || (report as any).issues || [],
       summary: report.summary || {},
     };
@@ -224,7 +237,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'ai-signal-clarity', data: report });
     }
-    result.aiSignalClarity = {
+    result[ToolName.AiSignalClarity] = {
       ...report,
       results: report.results || report.issues || [],
       summary: report.summary || {},
@@ -248,7 +261,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'agent-grounding', data: report });
     }
-    result.agentGrounding = {
+    result[ToolName.AgentGrounding] = {
       ...(report as any),
       results: (report as any).results || (report as any).issues || [],
       summary: report.summary || {},
@@ -272,7 +285,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'testability', data: report });
     }
-    result.testability = {
+    result[ToolName.TestabilityIndex] = {
       ...(report as any),
       results: (report as any).results || (report as any).issues || [],
       summary: report.summary || {},
@@ -297,7 +310,7 @@ export async function analyzeUnified(
     if (options.progressCallback) {
       options.progressCallback({ tool: 'change-amplification', data: report });
     }
-    result.changeAmplification = {
+    result[ToolName.ChangeAmplification] = {
       results: report.results || [],
       summary: report.summary || {},
     };
@@ -315,16 +328,17 @@ export async function scoreUnified(
   const toolScores: Map<string, ToolScoringOutput> = new Map();
 
   // Patterns score
-  if (results.patternDetect) {
+  if (results[ToolName.PatternDetect]) {
+    const data = results[ToolName.PatternDetect];
     const { calculatePatternScore } = await import('@aiready/pattern-detect');
     try {
       const patternScore = calculatePatternScore(
-        results.patternDetect.duplicates,
-        results.patternDetect.results?.length || 0
+        data.duplicates,
+        data.results?.length || 0
       );
 
       // Calculate token budget for patterns (waste = duplication)
-      const wastedTokens = results.patternDetect.duplicates.reduce(
+      const wastedTokens = data.duplicates.reduce(
         (sum: number, d: any) => sum + (d.tokenCost || 0),
         0
       );
@@ -337,17 +351,18 @@ export async function scoreUnified(
         },
       });
 
-      toolScores.set('pattern-detect', patternScore);
+      toolScores.set(ToolName.PatternDetect, patternScore);
     } catch (err) {
       void err;
     }
   }
 
   // Context score
-  if (results.contextAnalyzer) {
+  if (results[ToolName.ContextAnalyzer]) {
+    const data = results[ToolName.ContextAnalyzer];
     const { calculateContextScore } = await import('@aiready/context-analyzer');
     try {
-      const ctxSummary = results.contextAnalyzer.summary;
+      const ctxSummary = data.summary;
       const contextScore = calculateContextScore(ctxSummary);
 
       // Calculate token budget for context (waste = fragmentation + depth overhead)
@@ -360,72 +375,74 @@ export async function scoreUnified(
         },
       });
 
-      toolScores.set('context-analyzer', contextScore);
+      toolScores.set(ToolName.ContextAnalyzer, contextScore);
     } catch (err) {
       void err;
     }
   }
 
   // Consistency score
-  if (results.consistency) {
+  if (results[ToolName.NamingConsistency]) {
+    const data = results[ToolName.NamingConsistency];
     const { calculateConsistencyScore } = await import('@aiready/consistency');
     try {
-      const issues =
-        results.consistency.results?.flatMap((r: any) => r.issues) || [];
-      const totalFiles = results.consistency.summary?.filesAnalyzed || 0;
+      const issues = data.results?.flatMap((r: any) => r.issues) || [];
+      const totalFiles = data.summary?.filesAnalyzed || 0;
       const consistencyScore = calculateConsistencyScore(issues, totalFiles);
-      toolScores.set('consistency', consistencyScore);
+      toolScores.set(ToolName.NamingConsistency, consistencyScore);
     } catch (err) {
       void err;
     }
   }
 
   // AI signal clarity score
-  if (results.aiSignalClarity) {
+  if (results[ToolName.AiSignalClarity]) {
     const { calculateAiSignalClarityScore } =
       await import('@aiready/ai-signal-clarity');
     try {
-      const hrScore = calculateAiSignalClarityScore(results.aiSignalClarity);
-      toolScores.set('ai-signal-clarity', hrScore);
+      const hrScore = calculateAiSignalClarityScore(
+        results[ToolName.AiSignalClarity]
+      );
+      toolScores.set(ToolName.AiSignalClarity, hrScore);
     } catch (err) {
       void err;
     }
   }
 
   // Agent grounding score
-  if (results.agentGrounding) {
+  if (results[ToolName.AgentGrounding]) {
     const { calculateGroundingScore } =
       await import('@aiready/agent-grounding');
     try {
-      const agScore = calculateGroundingScore(results.agentGrounding);
-      toolScores.set('agent-grounding', agScore);
+      const agScore = calculateGroundingScore(results[ToolName.AgentGrounding]);
+      toolScores.set(ToolName.AgentGrounding, agScore);
     } catch (err) {
       void err;
     }
   }
 
   // Testability score
-  if (results.testability) {
+  if (results[ToolName.TestabilityIndex]) {
     const { calculateTestabilityScore } = await import('@aiready/testability');
     try {
-      const tbScore = calculateTestabilityScore(results.testability);
-      toolScores.set('testability', tbScore);
+      const tbScore = calculateTestabilityScore(
+        results[ToolName.TestabilityIndex]
+      );
+      toolScores.set(ToolName.TestabilityIndex, tbScore);
     } catch (err) {
       void err;
     }
   }
 
   // Documentation Drift score
-  if (results.docDrift) {
-    toolScores.set('doc-drift', {
-      toolName: 'doc-drift',
-      score:
-        results.docDrift.summary.score ||
-        results.docDrift.summary.totalScore ||
-        0,
-      rawMetrics: results.docDrift.summary,
+  if (results[ToolName.DocDrift]) {
+    const data = results[ToolName.DocDrift];
+    toolScores.set(ToolName.DocDrift, {
+      toolName: ToolName.DocDrift,
+      score: data.summary.score || data.summary.totalScore || 0,
+      rawMetrics: data.summary,
       factors: [],
-      recommendations: (results.docDrift.summary.recommendations || []).map(
+      recommendations: (data.summary.recommendations || []).map(
         (action: string) => ({
           action,
           estimatedImpact: 5,
@@ -436,36 +453,38 @@ export async function scoreUnified(
   }
 
   // Dependency Health score
-  if (results.dependencyHealth) {
-    toolScores.set('dependency-health', {
-      toolName: 'dependency-health',
-      score: results.dependencyHealth.summary.score || 0,
-      rawMetrics: results.dependencyHealth.summary,
+  if (results[ToolName.DependencyHealth]) {
+    const data = results[ToolName.DependencyHealth];
+    toolScores.set(ToolName.DependencyHealth, {
+      toolName: ToolName.DependencyHealth,
+      score: data.summary.score || 0,
+      rawMetrics: data.summary,
       factors: [],
-      recommendations: (
-        results.dependencyHealth.summary.recommendations || []
-      ).map((action: string) => ({
-        action,
-        estimatedImpact: 5,
-        priority: 'medium',
-      })),
+      recommendations: (data.summary.recommendations || []).map(
+        (action: string) => ({
+          action,
+          estimatedImpact: 5,
+          priority: 'medium',
+        })
+      ),
     });
   }
 
   // Change Amplification score
-  if (results.changeAmplification) {
-    toolScores.set('change-amplification', {
-      toolName: 'change-amplification',
-      score: results.changeAmplification.summary.score || 0,
-      rawMetrics: results.changeAmplification.summary,
+  if (results[ToolName.ChangeAmplification]) {
+    const data = results[ToolName.ChangeAmplification];
+    toolScores.set(ToolName.ChangeAmplification, {
+      toolName: ToolName.ChangeAmplification,
+      score: data.summary.score || 0,
+      rawMetrics: data.summary,
       factors: [],
-      recommendations: (
-        results.changeAmplification.summary.recommendations || []
-      ).map((action: string) => ({
-        action,
-        estimatedImpact: 5,
-        priority: 'medium',
-      })),
+      recommendations: (data.summary.recommendations || []).map(
+        (action: string) => ({
+          action,
+          estimatedImpact: 5,
+          priority: 'medium',
+        })
+      ),
     });
   }
 
@@ -496,40 +515,40 @@ export function generateUnifiedSummary(result: UnifiedAnalysisResult): string {
   output += `   Total issues found: ${summary.totalIssues}\n`;
   output += `   Execution time: ${(summary.executionTime / 1000).toFixed(2)}s\n\n`;
 
-  if (result.patternDetect) {
-    output += `🔍 Pattern Analysis: ${result.patternDetect.results.length} issues\n`;
+  if (result[ToolName.PatternDetect]) {
+    output += `🔍 Pattern Analysis: ${result[ToolName.PatternDetect].results.length} issues\n`;
   }
 
-  if (result.contextAnalyzer) {
-    output += `🧠 Context Analysis: ${result.contextAnalyzer.results.length} issues\n`;
+  if (result[ToolName.ContextAnalyzer]) {
+    output += `🧠 Context Analysis: ${result[ToolName.ContextAnalyzer].results.length} issues\n`;
   }
 
-  if (result.consistency) {
-    output += `🏷️ Consistency Analysis: ${result.consistency.summary.totalIssues} issues\n`;
+  if (result[ToolName.NamingConsistency]) {
+    output += `🏷️ Consistency Analysis: ${result[ToolName.NamingConsistency].summary.totalIssues} issues\n`;
   }
 
-  if (result.docDrift) {
-    output += `📝 Doc Drift Analysis: ${result.docDrift.results?.length || 0} issues\n`;
+  if (result[ToolName.DocDrift]) {
+    output += `📝 Doc Drift Analysis: ${result[ToolName.DocDrift].results?.length || 0} issues\n`;
   }
 
-  if (result.dependencyHealth) {
-    output += `📦 Dependency Health: ${result.dependencyHealth.results?.length || 0} issues\n`;
+  if (result[ToolName.DependencyHealth]) {
+    output += `📦 Dependency Health: ${result[ToolName.DependencyHealth].results?.length || 0} issues\n`;
   }
 
-  if (result.aiSignalClarity) {
-    output += `🧠 AI Signal Clarity: ${result.aiSignalClarity.summary?.totalSignals || 0} signals\n`;
+  if (result[ToolName.AiSignalClarity]) {
+    output += `🧠 AI Signal Clarity: ${result[ToolName.AiSignalClarity].summary?.totalSignals || 0} signals\n`;
   }
 
-  if (result.agentGrounding) {
-    output += `🧭 Agent Grounding: ${result.agentGrounding.results?.length || 0} issues\n`;
+  if (result[ToolName.AgentGrounding]) {
+    output += `🧭 Agent Grounding: ${result[ToolName.AgentGrounding].results?.length || 0} issues\n`;
   }
 
-  if (result.testability) {
-    output += `🧪 Testability Index: ${result.testability.results?.length || 0} issues\n`;
+  if (result[ToolName.TestabilityIndex]) {
+    output += `🧪 Testability Index: ${result[ToolName.TestabilityIndex].results?.length || 0} issues\n`;
   }
 
-  if (result.changeAmplification) {
-    output += `💥 Change Amplification: ${result.changeAmplification.summary?.totalIssues || 0} cascading risks\n`;
+  if (result[ToolName.ChangeAmplification]) {
+    output += `💥 Change Amplification: ${result[ToolName.ChangeAmplification].summary?.totalIssues || 0} cascading risks\n`;
   }
 
   return output;

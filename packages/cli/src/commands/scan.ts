@@ -24,6 +24,7 @@ import {
   getRepoMetadata,
   Severity,
   IssueType,
+  ToolName,
   type ToolScoringOutput,
 } from '@aiready/core';
 import { analyzeUnified, scoreUnified, type ScoringResult } from '../index';
@@ -465,30 +466,29 @@ export async function scanAction(directory: string, options: ScanOptions) {
       (finalOptions.tools || ['patterns', 'context', 'consistency']).join(', ')
     );
 
-    // Results summary
     console.log(chalk.cyan('\nResults summary:'));
     console.log(
       `  Total issues (all tools): ${chalk.bold(String(results.summary.totalIssues || 0))}`
     );
-    if (results.patternDetect) {
+    if (results[ToolName.PatternDetect]) {
       console.log(
-        `  Duplicate patterns found: ${chalk.bold(String(results.patternDetect.duplicates?.length || 0))}`
+        `  Duplicate patterns found: ${chalk.bold(String(results[ToolName.PatternDetect].duplicates?.length || 0))}`
       );
       console.log(
-        `  Pattern files with issues: ${chalk.bold(String(results.patternDetect.results.length || 0))}`
+        `  Pattern files with issues: ${chalk.bold(String(results[ToolName.PatternDetect].results.length || 0))}`
       );
     }
-    if (results.contextAnalyzer)
+    if (results[ToolName.ContextAnalyzer])
       console.log(
-        `  Context issues: ${chalk.bold(String(results.contextAnalyzer.results.length || 0))}`
+        `  Context issues: ${chalk.bold(String(results[ToolName.ContextAnalyzer].results.length || 0))}`
       );
-    if (results.consistency)
+    if (results[ToolName.NamingConsistency])
       console.log(
-        `  Consistency issues: ${chalk.bold(String(results.consistency.summary?.totalIssues || 0))}`
+        `  Consistency issues: ${chalk.bold(String(results[ToolName.NamingConsistency].summary?.totalIssues || 0))}`
       );
-    if (results.changeAmplification)
+    if (results[ToolName.ChangeAmplification])
       console.log(
-        `  Change amplification: ${chalk.bold(String(results.changeAmplification.summary?.score || 0))}/100`
+        `  Change amplification: ${chalk.bold(String(results[ToolName.ChangeAmplification].summary?.score || 0))}/100`
       );
     console.log(chalk.cyan('===========================\n'));
 
@@ -741,15 +741,15 @@ export async function scanAction(directory: string, options: ScanOptions) {
         });
       };
 
-      collect(res.patternDetect, IssueType.DuplicatePattern);
-      collect(res.contextAnalyzer, IssueType.ContextFragmentation);
-      collect(res.consistency, IssueType.NamingInconsistency);
-      collect(res.docDrift, IssueType.DocDrift);
-      collect(res.dependencyHealth, IssueType.DependencyHealth);
-      collect(res.aiSignalClarity, IssueType.AiSignalClarity);
-      collect(res.agentGrounding, IssueType.AgentNavigationFailure);
-      collect(res.testability, IssueType.LowTestability);
-      collect(res.changeAmplification, IssueType.ChangeAmplification);
+      collect(res[ToolName.PatternDetect], IssueType.DuplicatePattern);
+      collect(res[ToolName.ContextAnalyzer], IssueType.ContextFragmentation);
+      collect(res[ToolName.NamingConsistency], IssueType.NamingInconsistency);
+      collect(res[ToolName.DocDrift], IssueType.DocDrift);
+      collect(res[ToolName.DependencyHealth], IssueType.DependencyHealth);
+      collect(res[ToolName.AiSignalClarity], IssueType.AiSignalClarity);
+      collect(res[ToolName.AgentGrounding], IssueType.AgentNavigationFailure);
+      collect(res[ToolName.TestabilityIndex], IssueType.LowTestability);
+      collect(res[ToolName.ChangeAmplification], IssueType.ChangeAmplification);
 
       return {
         ...res,
@@ -864,11 +864,13 @@ export async function scanAction(directory: string, options: ScanOptions) {
         }
 
         // Output annotations for critical issues
-        if (results.patternDetect) {
-          const criticalPatterns = results.patternDetect.results.flatMap(
-            (p: any) =>
-              p.issues.filter((i: any) => i.severity === Severity.Critical)
+        if (results[ToolName.PatternDetect]) {
+          const criticalPatterns = results[
+            ToolName.PatternDetect
+          ].results.flatMap((p: any) =>
+            p.issues.filter((i: any) => i.severity === Severity.Critical)
           );
+
           criticalPatterns.slice(0, 10).forEach((issue: any) => {
             console.log(
               `::warning file=${issue.location?.file || 'unknown'},line=${issue.location?.line || 1}::${issue.message}`
@@ -896,22 +898,22 @@ export async function scanAction(directory: string, options: ScanOptions) {
         let criticalCount = 0;
         let majorCount = 0;
 
-        if (results.patternDetect) {
-          results.patternDetect.results.forEach((p: any) => {
+        if (results[ToolName.PatternDetect]) {
+          results[ToolName.PatternDetect].results.forEach((p: any) => {
             p.issues.forEach((i: any) => {
               if (i.severity === Severity.Critical) criticalCount++;
               if (i.severity === Severity.Major) majorCount++;
             });
           });
         }
-        if (results.contextAnalyzer) {
-          results.contextAnalyzer.results.forEach((c: any) => {
+        if (results[ToolName.ContextAnalyzer]) {
+          results[ToolName.ContextAnalyzer].results.forEach((c: any) => {
             if (c.severity === Severity.Critical) criticalCount++;
             if (c.severity === Severity.Major) majorCount++;
           });
         }
-        if (results.consistency) {
-          results.consistency.results.forEach((r: any) => {
+        if (results[ToolName.NamingConsistency]) {
+          results[ToolName.NamingConsistency].results.forEach((r: any) => {
             r.issues?.forEach((i: any) => {
               if (i.severity === Severity.Critical) criticalCount++;
               if (i.severity === Severity.Major) majorCount++;

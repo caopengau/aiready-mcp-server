@@ -7,6 +7,7 @@ import PlatformShell from '@/components/PlatformShell';
 import { AlertCircleIcon } from '@/components/Icons';
 import type { Repository, Team, TeamMember } from '@/lib/db';
 import type { AnalysisData } from '@/lib/storage';
+import { ToolName, FRIENDLY_TOOL_NAMES } from '@aiready/core';
 import { RepoHeader } from './components/RepoHeader';
 import { RepoDimensions } from './components/RepoDimensions';
 import { IssueFeed } from './components/IssueFeed';
@@ -158,7 +159,7 @@ function RepoDetailContent({ repo, user, teams, overallScore }: Props) {
             }
           }
 
-          if (toolName === 'semanticDuplicates' && issue.similarity) {
+          if (toolName === ToolName.PatternDetect && issue.similarity) {
             msg = `${issue.patternType ? issue.patternType.charAt(0).toUpperCase() + issue.patternType.slice(1) : 'Duplicate'} (${Math.round(issue.similarity * 100)}% similarity)`;
           }
 
@@ -178,22 +179,7 @@ function RepoDetailContent({ repo, user, teams, overallScore }: Props) {
     );
   }
 
-  const toolLabels: Record<string, string> = {
-    semanticDuplicates: 'Semantic Duplicates',
-    contextFragmentation: 'Context Budget',
-    namingConsistency: 'Naming & Patterns',
-    aiSignalClarity: 'AI Signal Clarity',
-    agentGrounding: 'Agent Grounding',
-    testabilityIndex: 'Testability Index',
-    documentationHealth: 'Documentation Drift',
-    dependencyHealth: 'Dependency Health',
-    changeAmplification: 'Change Amplification',
-    cognitiveLoad: 'Cognitive Load',
-    patternEntropy: 'Pattern Entropy',
-    conceptCohesion: 'Concept Cohesion',
-    docDrift: 'Documentation Drift',
-    semanticDistance: 'Semantic Distance',
-  };
+  const toolLabels = FRIENDLY_TOOL_NAMES;
 
   const filteredIssues = allIssues.filter((issue) => {
     if (filter.severity && issue.severity !== filter.severity) return false;
