@@ -16,6 +16,7 @@ import {
   TrashIcon,
   ChartIcon,
   RobotIcon,
+  AlertCircleIcon,
 } from '@/components/Icons';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
