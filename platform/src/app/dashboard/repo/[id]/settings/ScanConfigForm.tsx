@@ -428,12 +428,13 @@ export function ScanConfigForm({ repoId, initialSettings, onSave }: Props) {
                     settings.tools?.[ToolName.PatternDetect]?.approx !== false;
                   const newVal = !current;
 
-                  if (newVal) {
+                  if (!newVal) {
+                    // Disabling is the risky action here (performance penalty)
                     setConfirmData({
                       type: 'approx',
-                      title: 'Enable Approximate Matching?',
+                      title: 'Disable Approximate Matching?',
                       message:
-                        'Approximate matching uses fuzzy hashing to find logic clones with naming variations. This significantly increases memory usage and scan time for large repositories.',
+                        'WARNING: Disabling approximate matching forces an exact $O(N^2)$ comparison across all code blocks. This will significantly increase scan time and may cause timeouts on larger repositories.',
                       onConfirm: () => {
                         setSettings({
                           ...settings,
@@ -441,7 +442,7 @@ export function ScanConfigForm({ repoId, initialSettings, onSave }: Props) {
                             ...settings.tools,
                             [ToolName.PatternDetect]: {
                               ...settings.tools?.[ToolName.PatternDetect],
-                              approx: true,
+                              approx: false,
                             },
                           },
                         });
@@ -449,13 +450,14 @@ export function ScanConfigForm({ repoId, initialSettings, onSave }: Props) {
                       },
                     });
                   } else {
+                    // Enabling is the recommended/fast path
                     setSettings({
                       ...settings,
                       tools: {
                         ...settings.tools,
                         [ToolName.PatternDetect]: {
                           ...settings.tools?.[ToolName.PatternDetect],
-                          approx: false,
+                          approx: true,
                         },
                       },
                     });
@@ -463,23 +465,32 @@ export function ScanConfigForm({ repoId, initialSettings, onSave }: Props) {
                 }}
                 className={`group relative p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
                   settings.tools?.[ToolName.PatternDetect]?.approx !== false
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-500'
-                    : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'
+                    ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-500'
+                    : 'bg-red-500/10 border-red-500/30 text-red-500'
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase">
-                  Approximate Match
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase flex items-center gap-2">
+                    Approximate Match
+                    {settings.tools?.[ToolName.PatternDetect]?.approx ===
+                      false && (
+                      <span className="bg-red-500 text-[8px] px-1.5 py-0.5 rounded text-white">
+                        SLOW
+                      </span>
+                    )}
+                  </span>
+                </div>
                 <div
                   className={`w-2.5 h-2.5 rounded-full ${
                     settings.tools?.[ToolName.PatternDetect]?.approx !== false
-                      ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                      : 'bg-slate-800'
+                      ? 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]'
+                      : 'bg-red-500'
                   }`}
                 />
                 <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-48 p-3 bg-slate-900 border border-slate-800 rounded-xl text-[10px] text-slate-400 z-50 shadow-2xl normal-case">
-                  Allow fuzzy matching for logic clones that have minor naming
-                  or spacing variations.
+                  {settings.tools?.[ToolName.PatternDetect]?.approx !== false
+                    ? 'Uses optimized candidate selection for faster scans. (Recommended)'
+                    : 'Forces exhaustive pairwise comparison. Significantly slower.'}
                 </div>
               </div>
 
