@@ -150,11 +150,11 @@ export function ScanConfigForm({
   const estimatedTime = useMemo(() => {
     if (fileCount === 0) return null;
 
-    let seconds = 15; // Base overhead (clone + init)
+    let seconds = 20; // Base overhead (clone + init + container warm-up)
     const activeTools = settings.scan?.tools || [];
 
-    // 1. Core file scanning & parsing (0.05s per file)
-    seconds += fileCount * 0.05;
+    // 1. Core file scanning & parsing (0.1s per file - includes I/O and AST generation)
+    seconds += fileCount * 0.1;
 
     // 2. Pattern Detection (The most expensive O(N^2) tool)
     if (activeTools.includes(ToolName.PatternDetect)) {
@@ -165,9 +165,9 @@ export function ScanConfigForm({
       const minTokens = toolCfg?.minSharedTokens || 10;
       const maxCandidates = toolCfg?.maxCandidatesPerBlock || 100;
 
-      // minLines impact: number of blocks scales roughly inversely with sqrt(minLines)
-      // Base assumption: 5 blocks per file at 5 lines min.
-      const blocksPerFile = 5 * Math.sqrt(5 / minLines);
+      // minLines impact: number of blocks scales inversely with minLines
+      // More aggressive scaling for visible feedback: 8 blocks per file base
+      const blocksPerFile = 8 * (5 / minLines);
       const blocks = fileCount * blocksPerFile;
       const totalComparisons = (blocks * blocks) / 2;
 
@@ -176,45 +176,45 @@ export function ScanConfigForm({
       if (approx) {
         // Approximate mode uses hashing/indexing.
         // More tokens = more specific index = more pruning
-        const tokenPruningFactor = Math.min(0.99, 0.8 + minTokens * 0.02);
+        const tokenPruningFactor = Math.min(0.98, 0.7 + minTokens * 0.02);
         effectiveComparisons = totalComparisons * (1 - tokenPruningFactor);
 
         // maxCandidates limits the final verification step
+        // We add a floor to ensure maxCandidates still shows impact
         effectiveComparisons = Math.min(
           effectiveComparisons,
           blocks * maxCandidates
         );
       } else {
-        // Exhaustive mode
-        // Higher minSimilarity allows early exit in some comparison algos (e.g. Jaccard token count check)
-        const similarityPruningFactor = Math.max(0.1, minSimilarity);
+        // Exhaustive mode: pair-wise comparison of ALL blocks
+        // Higher minSimilarity allows some early exits but work is still O(N^2)
+        const similarityPruningFactor = Math.max(0.05, minSimilarity / 4);
         effectiveComparisons =
-          totalComparisons * (1.1 - similarityPruningFactor);
+          totalComparisons * (1.05 - similarityPruningFactor);
 
-        // maxCandidates still limits the total verification work
-        effectiveComparisons = Math.min(
-          effectiveComparisons,
-          blocks * maxCandidates * 10 // Factor of 10 for deep pairwise check
-        );
+        // maxCandidates significantly impacts verification depth
+        // Scale comparison cost by maxCandidates to show impact
+        const workPerComparison = 1 + maxCandidates / 50;
+        effectiveComparisons = effectiveComparisons * workPerComparison;
       }
 
-      // ~50,000 comparisons per second
-      seconds += effectiveComparisons / 50000;
+      // ~20,000 deep comparisons per second on Lambda
+      seconds += effectiveComparisons / 20000;
     }
 
     // 3. Context Analyzer (Recursive exploration)
     if (activeTools.includes(ToolName.ContextAnalyzer)) {
       const depth = settings.tools?.[ToolName.ContextAnalyzer]?.maxDepth || 5;
       // Exponential increase with depth
-      const depthFactor = Math.pow(1.4, depth - 5);
-      seconds += fileCount * 0.1 * depthFactor;
+      const depthFactor = Math.pow(1.5, depth - 5);
+      seconds += fileCount * 0.15 * depthFactor;
     }
 
     // 4. Other tools (Generally O(N))
     const otherToolsCount = activeTools.filter(
       (t) => t !== ToolName.PatternDetect && t !== ToolName.ContextAnalyzer
     ).length;
-    seconds += fileCount * 0.03 * otherToolsCount;
+    seconds += fileCount * 0.05 * otherToolsCount;
 
     return Math.round(seconds);
   }, [settings, fileCount]);
