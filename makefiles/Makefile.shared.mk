@@ -21,6 +21,9 @@ endif
 # Exclude skills (skills.sh distribution only, not npm)
 ALL_SPOKES := $(filter-out skills, $(notdir $(wildcard packages/*)))
 
+# Resolve root directory relative to this file
+ROOT_DIR ?= $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
+
 # Project directory definitions
 LANDING_DIR := $(ROOT_DIR)/landing
 PLATFORM_DIR := $(ROOT_DIR)/platform

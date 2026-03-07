@@ -231,7 +231,11 @@ export function createScanCommands(
       );
 
       // Show tool breakdown if available
-      if (result.scoring?.breakdown && result.scoring.breakdown.length > 0) {
+      if (
+        result.scoring?.breakdown &&
+        Array.isArray(result.scoring.breakdown) &&
+        result.scoring.breakdown.length > 0
+      ) {
         outputChannel.appendLine('');
         outputChannel.appendLine('Tool Breakdown:');
         result.scoring.breakdown.forEach((tool) => {

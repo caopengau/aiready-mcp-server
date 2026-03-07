@@ -47,7 +47,12 @@ function findReportsInDir(dir: string): ScanReport[] {
     for (const file of files) {
       try {
         const content = readFileSync(file.path, 'utf8');
+        if (!content || content.trim() === '') {
+          continue;
+        }
+
         const data = JSON.parse(content);
+        if (!data) continue;
 
         const score = data.scoring?.overall ?? 0;
         const rating = data.scoring?.rating ?? 'Unknown';
@@ -56,17 +61,29 @@ function findReportsInDir(dir: string): ScanReport[] {
           ? new Date(data.scoring.timestamp)
           : file.mtime;
 
-        const counts = countIssues(data);
+        // countIssues can be expensive or throw if data is malformed
+        let counts;
+        try {
+          counts = countIssues(data);
+        } catch (err) {
+          console.warn(`Failed to count issues for ${file.path}:`, err);
+          counts = { total: 0, critical: 0, major: 0, minor: 0, info: 0 };
+        }
 
         const tools: Array<{ name: string; score: number; rating: string }> =
           [];
-        data.scoring?.breakdown?.forEach((tool: any) => {
-          tools.push({
-            name: tool.toolName,
-            score: tool.score,
-            rating: tool.rating ?? getRatingFromScore(tool.score),
+
+        if (data.scoring?.breakdown && Array.isArray(data.scoring.breakdown)) {
+          data.scoring.breakdown.forEach((tool: any) => {
+            if (tool && tool.toolName) {
+              tools.push({
+                name: tool.toolName,
+                score: tool.score ?? 0,
+                rating: tool.rating ?? getRatingFromScore(tool.score ?? 0),
+              });
+            }
           });
-        });
+        }
 
         reports.push({
           id: file.name.replace('aiready-report-', '').replace('.json', ''),
@@ -150,7 +167,12 @@ export class AIReadyReportsProvider implements vscode.TreeDataProvider<vscode.Tr
   private workspacePath: string = '';
 
   refresh(): void {
-    this.reports = findAllReports();
+    try {
+      this.reports = findAllReports();
+    } catch (error) {
+      console.error('Failed to refresh reports:', error);
+      this.reports = [];
+    }
     this._onDidChangeTreeData.fire();
   }
 

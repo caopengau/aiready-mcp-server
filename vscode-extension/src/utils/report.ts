@@ -124,85 +124,119 @@ export function countIssues(result: AIReadyResult): {
 } {
   const counts = { critical: 0, major: 0, minor: 0, info: 0, total: 0 };
 
-  // Count pattern issues
-  result.patterns?.forEach((p) => {
-    p.issues?.forEach((issue) => {
-      counts[issue.severity] = (counts[issue.severity] || 0) + 1;
-      counts.total++;
+  if (Array.isArray(result.patterns)) {
+    result.patterns.forEach((p) => {
+      if (Array.isArray(p.issues)) {
+        p.issues.forEach((issue) => {
+          counts[issue.severity] = (counts[issue.severity] || 0) + 1;
+          counts.total++;
+        });
+      }
     });
-  });
+  }
 
   // Count context issues
-  result.context?.forEach((issue: any) => {
-    // Some formats have root level issues, some have nested
-    if (issue.severity) {
-      counts[issue.severity as keyof typeof counts] =
-        (counts[issue.severity as keyof typeof counts] || 0) + 1;
-      counts.total++;
-    }
-    issue.issues?.forEach((nested: any) => {
-      counts[nested.severity as keyof typeof counts] =
-        (counts[nested.severity as keyof typeof counts] || 0) + 1;
-      counts.total++;
+  if (Array.isArray(result.context)) {
+    result.context.forEach((issue: any) => {
+      // Some formats have root level issues, some have nested
+      if (issue.severity) {
+        counts[issue.severity as keyof typeof counts] =
+          (counts[issue.severity as keyof typeof counts] || 0) + 1;
+        counts.total++;
+      }
+      if (Array.isArray(issue.issues)) {
+        issue.issues.forEach((nested: any) => {
+          counts[nested.severity as keyof typeof counts] =
+            (counts[nested.severity as keyof typeof counts] || 0) + 1;
+          counts.total++;
+        });
+      }
     });
-  });
+  }
 
   // Count consistency issues
-  result.consistency?.results?.forEach((r) => {
-    r.issues?.forEach((issue) => {
+  if (result.consistency && Array.isArray(result.consistency.results)) {
+    result.consistency.results.forEach((r) => {
+      if (Array.isArray(r.issues)) {
+        r.issues.forEach((issue) => {
+          counts[issue.severity] = (counts[issue.severity] || 0) + 1;
+          counts.total++;
+        });
+      }
+    });
+  }
+
+  // Count doc drift issues
+  if (result.docDrift && Array.isArray(result.docDrift.issues)) {
+    result.docDrift.issues.forEach((issue) => {
       counts[issue.severity] = (counts[issue.severity] || 0) + 1;
       counts.total++;
     });
-  });
-
-  // Count doc drift issues
-  result.docDrift?.issues?.forEach((issue) => {
-    counts[issue.severity] = (counts[issue.severity] || 0) + 1;
-    counts.total++;
-  });
+  }
 
   // Count dependency issues
-  result.deps?.issues?.forEach((issue) => {
-    counts[issue.severity] = (counts[issue.severity] || 0) + 1;
-    counts.total++;
-  });
+  if (result.deps && Array.isArray(result.deps.issues)) {
+    result.deps.issues.forEach((issue) => {
+      counts[issue.severity] = (counts[issue.severity] || 0) + 1;
+      counts.total++;
+    });
+  }
 
   return counts;
 }
 
-/**
- * Collect all issues into a flat array for the provider
- */
 export function collectAllIssues(result: AIReadyResult): Issue[] {
-  return [
-    ...(result.patterns?.flatMap((p: any) =>
-      (p.issues || []).map((issue: any) => ({ ...issue, tool: 'patterns' }))
-    ) || []),
-    ...(result.context?.flatMap((issue: any) => {
-      const results = [];
+  const issues: Issue[] = [];
+
+  // Patterns
+  if (Array.isArray(result.patterns)) {
+    result.patterns.forEach((p: any) => {
+      if (Array.isArray(p.issues)) {
+        p.issues.forEach((issue: any) => {
+          issues.push({ ...issue, tool: 'patterns' });
+        });
+      }
+    });
+  }
+
+  // Context
+  if (Array.isArray(result.context)) {
+    result.context.forEach((issue: any) => {
       if (issue.severity) {
-        results.push({ ...issue, tool: 'context' });
+        issues.push({ ...issue, tool: 'context' });
       }
-      if (issue.issues) {
-        results.push(
-          ...issue.issues.map((i: any) => ({ ...i, tool: 'context' }))
-        );
+      if (Array.isArray(issue.issues)) {
+        issue.issues.forEach((i: any) => {
+          issues.push({ ...i, tool: 'context' });
+        });
       }
-      return results;
-    }) || []),
-    ...(result.consistency?.results?.flatMap((r: any) =>
-      (r.issues || []).map((issue: any) => ({
-        ...issue,
-        tool: 'consistency',
-      }))
-    ) || []),
-    ...(result.docDrift?.issues?.map((issue: any) => ({
-      ...issue,
-      tool: 'doc-drift',
-    })) || []),
-    ...(result.deps?.issues?.map((issue: any) => ({
-      ...issue,
-      tool: 'deps-health',
-    })) || []),
-  ];
+    });
+  }
+
+  // Consistency
+  if (result.consistency && Array.isArray(result.consistency.results)) {
+    result.consistency.results.forEach((r: any) => {
+      if (Array.isArray(r.issues)) {
+        r.issues.forEach((issue: any) => {
+          issues.push({ ...issue, tool: 'consistency' });
+        });
+      }
+    });
+  }
+
+  // Doc Drift
+  if (result.docDrift && Array.isArray(result.docDrift.issues)) {
+    result.docDrift.issues.forEach((issue: any) => {
+      issues.push({ ...issue, tool: 'doc-drift' });
+    });
+  }
+
+  // Deps
+  if (result.deps && Array.isArray(result.deps.issues)) {
+    result.deps.issues.forEach((issue: any) => {
+      issues.push({ ...issue, tool: 'deps-health' });
+    });
+  }
+
+  return issues;
 }

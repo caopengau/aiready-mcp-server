@@ -151,7 +151,11 @@ export class AIReadySummaryProvider implements vscode.TreeDataProvider<vscode.Tr
       } as vscode.TreeItem);
 
       // Add tool breakdown with bars
-      if (this.summary.breakdown && this.summary.breakdown.length > 0) {
+      if (
+        this.summary.breakdown &&
+        Array.isArray(this.summary.breakdown) &&
+        this.summary.breakdown.length > 0
+      ) {
         this.summary.breakdown.forEach((tool) => {
           const bar = createBarChart(tool.score, 12);
           items.push({

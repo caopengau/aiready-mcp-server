@@ -269,15 +269,17 @@ export class AIReadyIssuesProvider implements vscode.TreeDataProvider<vscode.Tre
       [Severity.Minor]: [],
       [Severity.Info]: [],
     };
-    issues.forEach((issue) => {
-      const sev = (issue.severity as string).toLowerCase();
-      if (groups[sev]) {
-        groups[sev].push(issue);
-      } else if (sev === 'critical') groups[Severity.Critical].push(issue);
-      else if (sev === 'major') groups[Severity.Major].push(issue);
-      else if (sev === 'minor') groups[Severity.Minor].push(issue);
-      else if (sev === 'info') groups[Severity.Info].push(issue);
-    });
+    if (Array.isArray(issues)) {
+      issues.forEach((issue) => {
+        const sev = (issue.severity as string).toLowerCase();
+        if (groups[sev]) {
+          groups[sev].push(issue);
+        } else if (sev === 'critical') groups[Severity.Critical].push(issue);
+        else if (sev === 'major') groups[Severity.Major].push(issue);
+        else if (sev === 'minor') groups[Severity.Minor].push(issue);
+        else if (sev === 'info') groups[Severity.Info].push(issue);
+      });
+    }
     // Sort by severity order
     return {
       [Severity.Critical]: groups[Severity.Critical],
@@ -289,21 +291,25 @@ export class AIReadyIssuesProvider implements vscode.TreeDataProvider<vscode.Tre
 
   private groupByTool(issues: Issue[]): Record<string, Issue[]> {
     const groups: Record<string, Issue[]> = {};
-    issues.forEach((issue) => {
-      const tool = issue.tool || 'unknown';
-      if (!groups[tool]) groups[tool] = [];
-      groups[tool].push(issue);
-    });
+    if (Array.isArray(issues)) {
+      issues.forEach((issue) => {
+        const tool = issue.tool || 'unknown';
+        if (!groups[tool]) groups[tool] = [];
+        groups[tool].push(issue);
+      });
+    }
     return groups;
   }
 
   private groupByFile(issues: Issue[]): Record<string, Issue[]> {
     const groups: Record<string, Issue[]> = {};
-    issues.forEach((issue) => {
-      const file = issue.location?.file || 'unknown';
-      if (!groups[file]) groups[file] = [];
-      groups[file].push(issue);
-    });
+    if (Array.isArray(issues)) {
+      issues.forEach((issue) => {
+        const file = issue.location?.file || 'unknown';
+        if (!groups[file]) groups[file] = [];
+        groups[file].push(issue);
+      });
+    }
     return groups;
   }
 }
