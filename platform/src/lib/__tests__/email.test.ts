@@ -1,13 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { sendEmail, sendWelcomeEmail } from '../email';
-import { SESClient } from '@aws-sdk/client-ses';
 
-vi.mock('@aws-sdk/client-ses', () => ({
-  SESClient: vi.fn().mockImplementation(() => ({
-    send: vi.fn().mockResolvedValue({ MessageId: 'test-id' }),
-  })),
-  SendEmailCommand: vi.fn(),
-}));
+vi.mock('@aws-sdk/client-ses', () => {
+  return {
+    SESClient: class {
+      send = vi.fn().mockResolvedValue({ MessageId: 'test-id' });
+    },
+    SendEmailCommand: class {},
+  };
+});
 
 describe('Email Utilities', () => {
   it('should send a general email', async () => {

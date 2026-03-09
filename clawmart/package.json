@@ -1,6 +1,6 @@
 {
   "name": "@aiready/clawmart",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "API client for ClawMart integration",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
