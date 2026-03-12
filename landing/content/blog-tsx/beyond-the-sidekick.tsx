@@ -10,15 +10,12 @@ const Post = () => (
       </strong>
     </blockquote>
 
-    <div className="my-8 max-w-4xl mx-auto text-center">
-      <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-12 rounded-3xl border border-indigo-500/20 shadow-2xl">
-        <h1 className="text-5xl font-black tracking-tight text-white mb-4 uppercase">
-          Beyond the Sidekick
-        </h1>
-        <p className="text-xl text-indigo-200/80 font-mono tracking-widest uppercase">
-          Series Part 02: The Rise of the Agentic System
-        </p>
-      </div>
+    <div className="my-12 max-w-5xl mx-auto text-center">
+      <img
+        src="/agentic-shift-series-2.png"
+        alt="Beyond the Sidekick Cover"
+        className="w-full h-auto rounded-3xl mb-12 shadow-2xl border border-white/5"
+      />
     </div>
 
     <p>
