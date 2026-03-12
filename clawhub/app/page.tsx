@@ -75,19 +75,19 @@ export default function ClawHubPage() {
         </div>
       </nav>
 
-      <section className="relative pt-32 pb-48 overflow-hidden border-b border-white/5 bg-[#0a0a0a]">
-        {/* Cinematic Background Image - INTEGRATED & VISIBLE */}
+      <section className="relative pt-32 pb-48 overflow-hidden border-b border-white/5">
+        {/* Cinematic Background Image - STACKING FIX & MAXIMUM IMPACT */}
         <div className="absolute inset-0 -z-10">
           <Image
             src="/hero.png"
             alt="Hero Background"
             fill
-            className="object-cover opacity-85"
+            className="object-cover"
             priority
           />
-          {/* Global overlay for readability without hiding edges */}
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
+          {/* Subtle Vignette to protect text while keeping edges vibrant */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(10,10,10,0.4)_50%,_#0a0a0a_100%)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#0a0a0a] opacity-60" />
         </div>
 
         <div className="container mx-auto px-4 relative flex flex-col items-center text-center">
