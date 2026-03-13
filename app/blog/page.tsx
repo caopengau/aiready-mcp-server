@@ -16,6 +16,8 @@ import BlogCard from '../../components/BlogCard';
 import Modal from '../../components/Modal';
 import LeadForm from '../../components/LeadForm';
 import Navbar from '../../components/Navbar';
+import Breadcrumbs from '../../components/Breadcrumbs';
+import JsonLd from '../../components/JsonLd';
 
 const BLOG_POSTS = [
   {
@@ -131,14 +133,32 @@ export default function BlogIndex() {
   // (In a real production app, we'd pass this down from a server component)
   const apiUrl = process.env.NEXT_PUBLIC_LEAD_API_URL || '';
 
+  const BLOG_JSON_LD = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'ClawMore Reflective Neural Journal',
+    description:
+      'Logging the mutations, failures, and autonomous breakthroughs of the serverlessclaw engine.',
+    url: 'https://clawmore.getaiready.dev/blog',
+    blogPost: BLOG_POSTS.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.excerpt,
+      datePublished: post.date,
+      url: `https://clawmore.getaiready.dev/blog/${post.slug}`,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-purple/30 selection:text-cyber-purple font-sans">
-      <Navbar variant="home" />
+      <JsonLd data={BLOG_JSON_LD} />
+      <Navbar />
 
       <BlogHero />
 
       <section className="py-24">
         <div className="container mx-auto px-4">
+          <Breadcrumbs items={[{ label: 'BLOG', href: '/blog' }]} />
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {BLOG_POSTS.map((post) => (
               <BlogCard key={post.slug} {...post} />

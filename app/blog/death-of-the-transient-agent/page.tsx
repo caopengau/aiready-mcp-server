@@ -21,6 +21,8 @@ import BlogCard from '../../../components/BlogCard';
 import Modal from '../../../components/Modal';
 import LeadForm from '../../../components/LeadForm';
 import SystemFlow from '../../../components/SystemFlow';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import JsonLd from '../../../components/JsonLd';
 
 const TRANSITION_NODES = [
   {
@@ -83,11 +85,24 @@ export default function BlogPost() {
   const closeModal = () => setIsModalOpen(false);
   const apiUrl = process.env.NEXT_PUBLIC_LEAD_API_URL || '';
 
+  const POST_JSON_LD = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'The Death of the Transient Agent',
+    description:
+      'Why stateless chat with infrastructure is a dead end. Introducing the case for mutable logic state that persists to source control.',
+    datePublished: '2026-03-13',
+    author: {
+      '@type': 'Organization',
+      name: 'ClawMore',
+    },
+    image: 'https://clawmore.getaiready.dev/hero.png',
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-purple/30 selection:text-cyber-purple font-sans">
+      <JsonLd data={POST_JSON_LD} />
       <Navbar variant="post" />
-
-      {/* Navigation */}
 
       {/* Article Header */}
       <header className="py-24 border-b border-white/5 relative overflow-hidden">
@@ -126,6 +141,15 @@ export default function BlogPost() {
       <main className="py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
+            <Breadcrumbs
+              items={[
+                { label: 'BLOG', href: '/blog' },
+                {
+                  label: 'THE DEATH OF THE TRANSIENT AGENT',
+                  href: '/blog/death-of-the-transient-agent',
+                },
+              ]}
+            />
             <article className="prose prose-invert prose-zinc max-w-none">
               <div className="space-y-12">
                 <section>
@@ -208,7 +232,7 @@ export default function BlogPost() {
                   <p className="text-zinc-200 leading-relaxed text-lg">
                     In the next post, we'll dive into the **Neural Spine**—the
                     EventBridge-driven mesh that allows these mutations to
-                    happen autonomously. We'll explore how the Reflector detects
+                    happen autonomously. we'll explore how the Reflector detects
                     infrastructure gaps and signals the Architect to design a
                     mutation.
                   </p>
@@ -217,7 +241,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Cycle
                 </div>
                 <Link
@@ -251,7 +275,7 @@ export default function BlogPost() {
       <section className="py-24 bg-cyber-purple/[0.02] border-y border-white/5">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-black italic mb-6">Stay Synchronized</h3>
-          <p className="text-zinc-300 mb-10 max-w-lg mx-auto text-sm">
+          <p className="text-zinc-500 mb-10 max-w-lg mx-auto text-sm">
             Join 1,200+ architects receiving autonomous mutation logs and
             technical deep dives weekly.
           </p>

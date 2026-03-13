@@ -20,10 +20,58 @@ import {
 import Modal from '../components/Modal';
 import LeadForm from '../components/LeadForm';
 import Navbar from '../components/Navbar';
+import FAQ from '../components/FAQ';
+import JsonLd from '../components/JsonLd';
 
 interface ClawMoreClientProps {
   apiUrl: string;
 }
+
+const FAQ_ITEMS = [
+  {
+    question: 'What exactly is ClawMore?',
+    answer:
+      'ClawMore is an autonomous agentic system built for AWS. Unlike standard AI assistants that just provide code snippets, ClawMore interprets your intent, designs infrastructure mutations, and persists them directly to your source control using SST Ion.',
+  },
+  {
+    question: 'How does the Autonomous Evolution loop work?',
+    answer:
+      'It uses a "Reflector" agent that monitors system logs and performance. When it detects a gap or opportunity for optimization, it triggers a Self-Correction Request (SCR). An "Architect" then designs a patch, and a "Coder" executes the mutation via Git.',
+  },
+  {
+    question: 'Is it safe to give ClawMore access to my AWS account?',
+    answer:
+      'Yes. ClawMore uses "Bring Your Own Cloud" (BYOC) architecture. It runs within your own VPC with strict IAM boundaries and Recursion Guards that prevent runaway mutations. You maintain full control over approval gates for high-risk changes.',
+  },
+  {
+    question: 'What is the "Evolution Tax"?',
+    answer:
+      'We align our success with yours. For the managed version, you pay a flat monthly fee plus $1 per successful mutation—an autonomous commit that passes all your CI/CD gates. If your system is stagnant, you pay zero for mutations.',
+  },
+  {
+    question: 'How do I get started for free?',
+    answer:
+      'The Community Node is 100% open source and free forever. You can fork the repository, deploy it to your own AWS account, and start using the core autonomous engine today.',
+  },
+];
+
+const CLAW_MORE_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'ClawMore',
+  description: 'Autonomous Infrastructure Evolution for AWS',
+  applicationCategory: 'DevOpsApplication',
+  operatingSystem: 'AWS',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  author: {
+    '@type': 'Organization',
+    name: 'Perpetual Evolution',
+  },
+};
 
 export default function ClawMoreClient({ apiUrl }: ClawMoreClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,8 +85,9 @@ export default function ClawMoreClient({ apiUrl }: ClawMoreClientProps) {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-blue/30 selection:text-cyber-blue font-sans">
-      <Navbar variant="home" />
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-blue/30 selection:text-cyber-blue font-sans text-left">
+      <JsonLd data={CLAW_MORE_JSON_LD} />
+      <Navbar />
 
       <section className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden border-b border-white/5 isolate py-20">
         {/* Cinematic Background Image - STACKING FIX & MAXIMUM IMPACT */}
@@ -410,6 +459,8 @@ export default function ClawMoreClient({ apiUrl }: ClawMoreClientProps) {
           </div>
         </div>
       </section>
+
+      <FAQ items={FAQ_ITEMS} />
 
       {/* Footer */}
       <footer className="py-20 border-t border-white/5 bg-black/40">
