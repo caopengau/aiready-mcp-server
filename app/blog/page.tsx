@@ -147,7 +147,7 @@ export default function BlogIndex() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/#features"
               className="hover:text-cyber-blue transition-colors"
@@ -207,7 +207,7 @@ export default function BlogIndex() {
             <h2 className="text-4xl font-black mb-6 tracking-tighter italic">
               Subscribe to Neural Updates
             </h2>
-            <p className="text-zinc-500 max-w-xl mx-auto mb-10 text-sm leading-relaxed">
+            <p className="text-zinc-300 max-w-xl mx-auto mb-10 text-sm leading-relaxed">
               Get notified every time the{' '}
               <span className="text-white">serverlessclaw</span> engine mutates
               its own architecture or releases a new technical reflective log.
@@ -226,7 +226,7 @@ export default function BlogIndex() {
 
       {/* Footer */}
       <footer className="py-20 border-t border-white/5 bg-black/40">
-        <div className="container mx-auto px-4 text-center text-zinc-600 text-[10px] font-mono uppercase tracking-[0.3em]">
+        <div className="container mx-auto px-4 text-center text-zinc-400 text-[10px] font-mono uppercase tracking-[0.3em]">
           <div className="flex items-center justify-center gap-4 mb-8">
             <Image
               src="/logo.png"

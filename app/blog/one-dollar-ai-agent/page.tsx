@@ -95,7 +95,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -116,11 +116,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 MINIMALIST_ARCHITECT
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: 1dollarai</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>06 MIN READ</span>
               </div>
@@ -131,7 +131,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">AI Agent</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Breaking the 24/7 hosting trap. How to run a multi-channel AI
               backbone for the price of a single coffee.
             </p>
@@ -152,14 +152,14 @@ export default function BlogPost() {
                     </span>
                     The 24/7 Hosting Trap
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Most AI agents are deployed on dedicated VPS instances (EC2,
                     DigitalOcean, etc.). This means you pay for compute 100% of
                     the time, even when the agent is idle. For a personal
                     assistant, this is extremely inefficient. You're effectively
                     paying a "waiting tax" for 23 hours a day.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     `serverlessclaw` flips the script. We don't host an agent;
                     we host a **Gateway**.
                   </p>
@@ -172,7 +172,7 @@ export default function BlogPost() {
                     </span>
                     Scale-to-Zero Architecture
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     By leveraging **AWS Lambda** as the primary entry point and
                     **AWS Fargate** on-demand for the reasoning engine, we
                     achieve a true "Scale-to-Zero" state. When you're not
@@ -194,14 +194,14 @@ export default function BlogPost() {
                     </span>
                     The Blueprint for $1/Month
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Achieving the $1/month target requires aggressive
                     optimization of every AWS component. We use DynamoDB in
                     on-demand mode for task state and S3 for long-term memory.
                     The "spiky" nature of these services aligns perfectly with
                     personal AI usage patterns.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <DollarSign className="w-3 h-3" />
                       <span>COST_OPTIMIZATION_LOG.json</span>
@@ -225,7 +225,7 @@ export default function BlogPost() {
                     </span>
                     The Persistence Challenge
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     The trade-off for scale-to-zero is the "Cold Start" and
                     state loss. In our next entry, **The Bridge Pattern**, we'll
                     explain how we solved the persistent connection problem in
@@ -236,7 +236,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Minimalist
                 </div>
                 <Link

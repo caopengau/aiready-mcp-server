@@ -104,7 +104,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -125,11 +125,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 SAFETY_GUARDS
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: bd95a79</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>06 MIN READ</span>
               </div>
@@ -140,7 +140,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">Safety & VPCs</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               "What if it deletes my production database?" Explaining our
               multi-layered approach to recursion guards and context isolation.
             </p>
@@ -161,14 +161,14 @@ export default function BlogPost() {
                     </span>
                     The Fear of the Runaway Loop
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     The biggest challenge in autonomous infrastructure isn't
                     intelligence—it's **Control**. If an agent identifies a gap
                     and attempts a mutation that introduces a new gap, you risk
                     a "Recursion Storm" where the machine burns your AWS budget
                     in a circular attempt to fix itself.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     ClawMore solves this through three non-negotiable safety
                     layers: Recursion Guards, Approval Gates, and VPC Isolation.
                   </p>
@@ -181,7 +181,7 @@ export default function BlogPost() {
                     </span>
                     The Recursion Guard
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Every mutation event is tracked by a global limiter. The
                     **Recursion Guard** monitors the depth and frequency of
                     mutations per resource. If the engine attempts to mutate the
@@ -204,14 +204,14 @@ export default function BlogPost() {
                     </span>
                     Context Isolation (BYOC)
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     With **Bring Your Own Cloud (BYOC)**, the engine's execution
                     weights are kept within your own VPC. We use strict IAM
                     boundaries and VPC endpoints to ensure that the agent can
                     only "see" and "mutate" the resources you have explicitly
                     whitelisted.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <Lock className="w-3 h-3" />
                       <span>BOUNDARY_POLICY.json</span>
@@ -237,14 +237,14 @@ export default function BlogPost() {
                     </span>
                     The Future of Autonomous Ops
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Autonomous infrastructure is no longer a science fiction
                     concept. By combining mutable logic state, an event-driven
                     neural spine, and empirical reflection loops,
                     `serverlessclaw` provides a blueprint for systems that don't
                     just run—they evolve.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     The Mutation Cycle is complete. We invite you to fork the
                     repository, deploy your own Community Node, and watch your
                     infrastructure learn to walk.

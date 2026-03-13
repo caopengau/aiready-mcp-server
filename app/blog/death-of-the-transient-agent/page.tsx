@@ -99,7 +99,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -120,11 +120,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 CORE_ENGINE
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: 5086da9</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>06 MIN READ</span>
               </div>
@@ -135,7 +135,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">Transient Agent</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Why stateless chat with infrastructure is a dead end. Introducing
               the case for mutable logic state that persists to source control.
             </p>
@@ -156,14 +156,14 @@ export default function BlogPost() {
                     </span>
                     The Context Window Trap
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Current AI infrastructure assistants operate as transient
                     observers. You ask for a VPC, they generate a snippet, and
                     then they vanish. The "context" of your infrastructure
                     exists only in the volatile memory of a chat session. When
                     that session ends, the intelligence disappears.
                   </p>
-                  <div className="mt-8 p-6 bg-white/[0.02] border border-white/5 rounded-sm font-mono text-[11px] text-zinc-500 italic">
+                  <div className="mt-8 p-6 bg-white/[0.02] border border-white/5 rounded-sm font-mono text-[11px] text-zinc-300 italic">
                     {'// Standard Workflow: Volatile & Disconnected'} <br />
                     {'1. Human asks for S3 bucket'} <br />
                     {'2. AI generates CloudFormation'} <br />
@@ -187,7 +187,7 @@ export default function BlogPost() {
                     </span>
                     Mutation as Primary Logic
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     ClawMore treats infrastructure as{' '}
                     <span className="text-white italic font-bold">
                       Mutable Logic State
@@ -196,7 +196,7 @@ export default function BlogPost() {
                     patch and commits it directly to your source control. The
                     "truth" isn't in a database—it's in your Git history.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     This creates a recursive loop where the agent doesn't just
                     manage the infrastructure; it{' '}
                     <span className="text-cyber-purple">becomes</span> the
@@ -226,7 +226,7 @@ export default function BlogPost() {
                     </span>
                     The Reflective Neural Loop
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     In the next post, we'll dive into the **Neural Spine**—the
                     EventBridge-driven mesh that allows these mutations to
                     happen autonomously. We'll explore how the Reflector detects
@@ -238,7 +238,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Cycle
                 </div>
                 <Link
@@ -272,7 +272,7 @@ export default function BlogPost() {
       <section className="py-24 bg-cyber-purple/[0.02] border-y border-white/5">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-black italic mb-6">Stay Synchronized</h3>
-          <p className="text-zinc-500 mb-10 max-w-lg mx-auto text-sm">
+          <p className="text-zinc-300 mb-10 max-w-lg mx-auto text-sm">
             Join 1,200+ architects receiving autonomous mutation logs and
             technical deep dives weekly.
           </p>

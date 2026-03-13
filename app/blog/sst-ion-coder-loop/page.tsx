@@ -91,7 +91,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -112,11 +112,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 JIT_INFRASTRUCTURE
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: a2eb83b</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>07 MIN READ</span>
               </div>
@@ -127,7 +127,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">Coder Loop</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Closing the gap between LLM reasoning and Pulumi-based deployment.
               How we achieve sub-second infrastructure mutations.
             </p>
@@ -148,14 +148,14 @@ export default function BlogPost() {
                     </span>
                     Reasoning is Not Deployment
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Generating a Terraform snippet is easy. Ensuring that
                     snippet is valid, syntactically correct, and compatible with
                     your existing stack is where 99% of AI automation fails.
                     Most systems are "opinionated but unverified"—they hope for
                     the best and leave the human to clean up the mess.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     In `serverlessclaw`, we treat deployment as a first-class
                     citizen of the reasoning process. The engine doesn't just
                     "think" about infra; it executes it via **The Coder Loop**.
@@ -169,14 +169,14 @@ export default function BlogPost() {
                     </span>
                     The JIT Infrastructure Engine
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     We chose **SST Ion** (built on Pulumi) because it allows for
                     Just-In-Time (JIT) infrastructure mutations. Unlike
                     traditional IaC tools that require slow planning phases, SST
                     Ion gives the Coder agent the ability to define and deploy
                     resources in a sub-second loop.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     When the Architect pulses a `PATCH_PLANNED` event, the Coder
                     agent ingests the intent and translates it into
                     TypeScript-based infrastructure code.
@@ -196,14 +196,14 @@ export default function BlogPost() {
                     </span>
                     Verified Mutation (The Coder Gate)
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     The Coder doesn't just push code. It runs a local synthesis
                     check to ensure the SST Ion definition is valid. If the
                     synthesis fails, the Coder emits a `REASONING_ERROR` back to
                     the neural spine, triggering a reflection loop for the
                     Architect to try again.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <Code className="w-3 h-3" />
                       <span>CODER_MUTATION_LOG.ts</span>
@@ -230,12 +230,12 @@ api.route("POST /submit", {
                     </span>
                     Safety First
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Of course, giving a machine the keys to your AWS account is
                     terrifying. That's why every Coder Loop is wrapped in
                     **Recursion Guards**.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     In our final post, we'll explore **Ironclad Autonomy**—how
                     we use VPC isolation and mutation limiters to ensure the
                     engine never "runs away" with your budget or your data.
@@ -245,7 +245,7 @@ api.route("POST /submit", {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Cycle
                 </div>
                 <Link
@@ -279,7 +279,7 @@ api.route("POST /submit", {
       <section className="py-24 bg-cyber-purple/[0.02] border-y border-white/5">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-black italic mb-6">Stay Synchronized</h3>
-          <p className="text-zinc-500 mb-10 max-w-lg mx-auto text-sm">
+          <p className="text-zinc-300 mb-10 max-w-lg mx-auto text-sm">
             Join 1,200+ architects receiving autonomous mutation logs and
             technical deep dives weekly.
           </p>

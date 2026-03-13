@@ -90,7 +90,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -111,11 +111,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 NETWORK_SPINE
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: 915c10e</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>08 MIN READ</span>
               </div>
@@ -126,7 +126,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">Neural Spine</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Mapping the ClawFlow mesh. How asynchronous events allow decoupled
               agents to coordinate without a central controller.
             </p>
@@ -147,14 +147,14 @@ export default function BlogPost() {
                     </span>
                     The Monolith Problem
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Traditional automation scripts are monolithic. They follow a
                     rigid, linear execution path: *A must finish before B can
                     start.* In the world of autonomous infrastructure, this is
                     fatal. If the Coder agent is busy committing a patch, the
                     Reflector shouldn't stop monitoring for new gaps.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     We needed a nervous system—a way for agents to "pulse" their
                     intent across the entire cluster without waiting for a
                     response.
@@ -168,14 +168,14 @@ export default function BlogPost() {
                     </span>
                     ClawFlow: Decoupled Autonomy
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Enter **ClawFlow**. Built on AWS EventBridge, it's a
                     decentralized mesh where every action is a discrete event.
                     When the Reflector identifies a performance bottleneck, it
                     doesn't "call" the Architect. It emits a `GAP_DETECTED`
                     event to the neural spine.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     Any agent tuned to that frequency can react. The Architect
                     picks up the signal, designs a solution, and pulses a
                     `MUTATION_PLANNED` event.
@@ -191,7 +191,7 @@ export default function BlogPost() {
                     </span>
                     Unlimited Breadth
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     This asynchronous nature gives `serverlessclaw` what we call
                     **Unlimited Breadth**. Because there is no central
                     controller, we can scale sub-agents horizontally across the
@@ -208,7 +208,7 @@ export default function BlogPost() {
                     </span>
                     The Next Evolution
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Having a neural spine is one thing; having a "conscience" is
                     another. In the next post, we'll explore **The
                     Reflector**—the autonomous critique mechanism that ensures
@@ -219,7 +219,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Cycle
                 </div>
                 <Link
@@ -253,7 +253,7 @@ export default function BlogPost() {
       <section className="py-24 bg-cyber-purple/[0.02] border-y border-white/5">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-black italic mb-6">Stay Synchronized</h3>
-          <p className="text-zinc-500 mb-10 max-w-lg mx-auto text-sm">
+          <p className="text-zinc-300 mb-10 max-w-lg mx-auto text-sm">
             Join 1,200+ architects receiving autonomous mutation logs and
             technical deep dives weekly.
           </p>

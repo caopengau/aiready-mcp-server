@@ -90,7 +90,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -111,11 +111,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 OMNI_CHANNEL
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: omni-gate</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>06 MIN READ</span>
               </div>
@@ -128,7 +128,7 @@ export default function BlogPost() {
               </span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Integrating Telegram, Discord, Slack, and even iMessage into a
               unified AI spine. How we built a multi-platform agent that never
               misses a pulse.
@@ -150,13 +150,13 @@ export default function BlogPost() {
                     </span>
                     The Fragmentation Problem
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Current AI tools are siloed. You talk to one agent in a web
                     browser, another in your IDE, and maybe a third in a
                     dedicated mobile app. Your context is scattered across four
                     different interfaces, and none of them talk to each other.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     In the `serverlessclaw` philosophy, your AI agent should be
                     ubiquitous. It shouldn't matter if you're on your laptop,
                     your phone, or in a team chat—the agent is always one
@@ -171,7 +171,7 @@ export default function BlogPost() {
                     </span>
                     The Unified Gateway
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     We built a **Unified Gateway** that normalizes signals from
                     six different messaging platforms into a single "intent
                     stream." Whether the trigger is a `/deploy` command from
@@ -193,14 +193,14 @@ export default function BlogPost() {
                     </span>
                     iMessage & BlueBubbles Integration
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     One of our most requested "gold" features was the iMessage
                     integration. By leveraging the BlueBubbles protocol,
                     `serverlessclaw` can act as a native contact on your iPhone.
                     You can text your agent to check server logs or deploy a
                     patch while walking to lunch.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <Share2 className="w-3 h-3" />
                       <span>GATEWAY_REGISTRY.json</span>
@@ -226,13 +226,13 @@ export default function BlogPost() {
                     </span>
                     Stateless Identity
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     The magic of the multi-channel approach is that your
                     "identity" is maintained across all platforms via DynamoDB.
                     The agent knows you're the same user whether you're DMing it
                     on Discord or replying to a group thread in Teams.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     In our next entry, **Surviving the Void**, we'll dive deep
                     into the persistence layer that makes this cross-platform
                     memory possible.
@@ -242,7 +242,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Minimalist
                 </div>
                 <Link

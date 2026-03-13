@@ -103,7 +103,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -124,11 +124,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 SAFETY_GUARDS
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: bd95a79</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>05 MIN READ</span>
               </div>
@@ -139,7 +139,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">that Self-Critique</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Most AI systems wait for humans to find bugs. Claw finds them
               itself using autonomous Gap Detection Loops.
             </p>
@@ -160,13 +160,13 @@ export default function BlogPost() {
                     </span>
                     The Feedback Vacuum
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     In standard DevOps, "feedback" is a human-led process. You
                     deploy code, wait for a user to complain or a dashboard to
                     turn red, and then *you* decide what to fix. In an
                     autonomous system, this delay is a catastrophic failure.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     ClawMore eliminates this delay through **The Reflector**—a
                     dedicated agent whose only job is to watch the system fail
                     and understand why.
@@ -180,13 +180,13 @@ export default function BlogPost() {
                     </span>
                     Autonomous Gap Detection
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     The Reflector operates by continuously streaming CloudWatch
                     logs, performance metrics, and VPC flow logs. It doesn't
                     just look for "Errors"; it looks for **Inconsistencies**
                     between intended state and actual performance.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     When it identifies a functional gap—like a lambda reaching
                     its concurrency limit or a security group being too
                     permissive—it triggers a **Self-Correction Request (SCR)**.
@@ -206,13 +206,13 @@ export default function BlogPost() {
                     </span>
                     The SCR: A Call to Mutation
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     An SCR is more than a ticket; it's a signed, technical
                     directive pulsed across the **Neural Spine**. It contains
                     the failure context, the suspected root cause, and a mandate
                     for the Architect agent to design a mutation.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <AlertTriangle className="w-3 h-3" />
                       <span>SCR_PAYLOAD_V1</span>
@@ -233,13 +233,13 @@ export default function BlogPost() {
                     </span>
                     Engineering a Conscience
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     By giving the machine the ability to critique its own
                     execution, we transform it from a tool into a teammate. The
                     Reflector is the engine's conscience, ensuring every
                     mutation is grounded in empirical reality.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     But once a mutation is planned, how do we deploy it safely?
                     In the next post, we'll explore **SST Ion & The Coder
                     Loop**—the mechanism that closes the gap between reasoning
@@ -250,7 +250,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Cycle
                 </div>
                 <Link href="/blog/sst-ion-coder-loop" className="block group">
@@ -281,7 +281,7 @@ export default function BlogPost() {
       <section className="py-24 bg-cyber-purple/[0.02] border-y border-white/5">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-black italic mb-6">Stay Synchronized</h3>
-          <p className="text-zinc-500 mb-10 max-w-lg mx-auto text-sm">
+          <p className="text-zinc-300 mb-10 max-w-lg mx-auto text-sm">
             Join 1,200+ architects receiving autonomous mutation logs and
             technical deep dives weekly.
           </p>

@@ -105,7 +105,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -126,11 +126,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 INFRA_AS_CODE
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: cdk-master</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>06 MIN READ</span>
               </div>
@@ -141,7 +141,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">CDK Monorepo Mastery</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Organizing a complex AI backbone into a single, deployable
               blueprint. How we use AWS CDK and npm workspaces to manage the
               serverlessclaw monorepo.
@@ -163,14 +163,14 @@ export default function BlogPost() {
                     </span>
                     The Complexity Problem
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     A system like `serverlessclaw` isn't just a single script.
                     It's a collection of Lambda functions, Fargate tasks,
                     DynamoDB tables, S3 buckets, and IAM roles. Manually
                     configuring these in the AWS Console is a recipe for
                     disaster.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     We needed a way to version our infrastructure alongside our
                     code. We chose the **AWS CDK** (Cloud Development Kit) to
                     treat our cloud architecture as a software library.
@@ -184,7 +184,7 @@ export default function BlogPost() {
                     </span>
                     The Monorepo Blueprint
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     By using **npm workspaces**, we organize the engine into
                     discrete, reusable packages. The `gateway` handles inbound
                     signals, the `core` manages reasoning, and the `infra`
@@ -205,7 +205,7 @@ export default function BlogPost() {
                     </span>
                     TypeScript End-to-End
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     One of the biggest advantages of our setup is **Type
                     Safety**. Because both our application code and our
                     infrastructure are written in TypeScript, we can share types
@@ -213,7 +213,7 @@ export default function BlogPost() {
                     our CDK stack, the application code immediately knows about
                     it.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <Box className="w-3 h-3" />
                       <span>CLAW_BLUEPRINT.ts</span>
@@ -243,14 +243,14 @@ export class ClawSpineStack extends cdk.Stack {
                     </span>
                     The Series Finale
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     This concludes our 10-part deep dive into the **Reflective
                     Neural Journal**. From the philosophy of mutable logic to
                     the mastery of CDK deployment, we hope this series has
                     provided a clear blueprint for the future of autonomous
                     infrastructure.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     The code is open. The architecture is proven. The only thing
                     missing is your first mutation.
                   </p>

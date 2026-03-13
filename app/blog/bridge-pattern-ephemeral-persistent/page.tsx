@@ -91,7 +91,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -112,11 +112,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 PROTOCOL_BRIDGE
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: bridge-proto</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>07 MIN READ</span>
               </div>
@@ -127,7 +127,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">HTTP to WebSocket</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               Solving the "Persistent connection" problem in a serverless world.
               How we connect ephemeral Lambda triggers to long-running AI
               streams.
@@ -149,13 +149,13 @@ export default function BlogPost() {
                     </span>
                     The Connection Paradox
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     Serverless functions (AWS Lambda) are built for short-lived,
                     request-response cycles. AI agents, however, often require
                     persistent WebSocket connections to maintain "eyes on" a
                     task or to stream long-form reasoning.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     If you kill the connection, you kill the agent's context.
                     How do we keep the conversation alive when the underlying
                     compute is designed to die?
@@ -169,7 +169,7 @@ export default function BlogPost() {
                     </span>
                     The Bridge Server Innovation
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     We implemented a custom **Bridge Server** inside the Fargate
                     container. This bridge acts as a protocol translator. It
                     accepts ephemeral HTTP POST requests from the Lambda gateway
@@ -191,14 +191,14 @@ export default function BlogPost() {
                     </span>
                     Piping Intent
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     When a message arrives via Telegram, the Lambda Gateway
                     spins up the Fargate container if it's not already running.
                     The Bridge Server then "re-hydrates" the session state from
                     DynamoDB and establishes a WebSocket connection to the AI
                     provider.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <LinkIcon className="w-3 h-3" />
                       <span>BRIDGE_TRANSLATOR.ts</span>
@@ -225,13 +225,13 @@ app.post('/gateway/message', async (req, res) => {
                     </span>
                     Stateless But Connected
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     The Bridge Pattern allows `serverlessclaw` to maintain the
                     illusion of a persistent server while benefiting from the
                     cost savings of ephemeral compute. It's the technical glue
                     that makes the $1/month AI agent possible.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     In our next entry, **Omni-Channel Command**, we'll explore
                     how this bridge connects to six different messaging
                     platforms simultaneously.
@@ -241,7 +241,7 @@ app.post('/gateway/message', async (req, res) => {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Minimalist
                 </div>
                 <Link

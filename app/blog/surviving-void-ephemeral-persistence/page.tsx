@@ -103,7 +103,7 @@ export default function BlogPost() {
               ClawMore
             </span>
           </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
             <Link
               href="/blog"
               className="hover:text-cyber-purple transition-colors flex items-center gap-2"
@@ -124,11 +124,11 @@ export default function BlogPost() {
               <div className="text-cyber-purple font-mono text-[9px] uppercase tracking-[0.4em] font-black border border-cyber-purple/20 px-2 py-1 bg-cyber-purple/5">
                 EPHEMERAL_PERSISTENCE
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Hash className="w-3 h-3" />
                 <span>HASH: state-void</span>
               </div>
-              <div className="flex items-center gap-1.5 text-zinc-600 font-mono text-[9px]">
+              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[9px]">
                 <Clock className="w-3 h-3" />
                 <span>07 MIN READ</span>
               </div>
@@ -139,7 +139,7 @@ export default function BlogPost() {
               <span className="text-cyber-purple">Cross-Lifecycle Memory</span>
             </h1>
 
-            <p className="text-xl text-zinc-400 font-light leading-relaxed italic">
+            <p className="text-xl text-zinc-200 font-light leading-relaxed italic">
               How do you keep an AI agent from forgetting its purpose when its
               runtime is destroyed every 15 minutes? Exploring the S3 + DynamoDB
               state backbone.
@@ -161,13 +161,13 @@ export default function BlogPost() {
                     </span>
                     The Amnesia Risk
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     In a "Scale-to-Zero" architecture, the compute instance (AWS
                     Fargate) is ephemeral. It spins up to handle a request and
                     spins down when idle. For a traditional application, this is
                     fine. For an AI agent, it's a disaster.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     If the agent loses its volatile memory, it loses the context
                     of the conversation, the status of its current background
                     tasks, and its sense of "identity."
@@ -181,7 +181,7 @@ export default function BlogPost() {
                     </span>
                     The Multi-Tiered Memory Stack
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     `serverlessclaw` solves this through a multi-tiered
                     persistence stack. We use **DynamoDB** for high-frequency
                     task state and **S3** for long-term "reflective memory."
@@ -203,14 +203,14 @@ export default function BlogPost() {
                     </span>
                     Atomic Task Syncing
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     When an agent initiates a complex task—like migrating a
                     database—it writes an atomic entry to DynamoDB. If the
                     container crashes mid-task, the *next* instance that spins
                     up detects the unfinished task and resumes execution from
                     the last verified checkpoint.
                   </p>
-                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-400">
+                  <div className="mt-8 p-6 bg-zinc-900/50 border border-white/10 rounded-sm font-mono text-[11px] text-zinc-200">
                     <div className="flex items-center gap-2 text-cyber-purple mb-2">
                       <Database className="w-3 h-3" />
                       <span>STATE_SNAPSHOT.json</span>
@@ -233,13 +233,13 @@ export default function BlogPost() {
                     </span>
                     Memory as Infrastructure
                   </h2>
-                  <p className="text-zinc-400 leading-relaxed text-lg">
+                  <p className="text-zinc-200 leading-relaxed text-lg">
                     By decoupling memory from compute, we ensure that
                     `serverlessclaw` is truly indestructible. You can delete the
                     entire Fargate cluster, and the agent will "wake up" in a
                     new one with its context perfectly intact.
                   </p>
-                  <p className="text-zinc-400 leading-relaxed text-lg mt-6">
+                  <p className="text-zinc-200 leading-relaxed text-lg mt-6">
                     In our final entry of the series, **CDK Monorepo Mastery**,
                     we'll look at how we package all these moving parts into a
                     single, deployable blueprint.
@@ -249,7 +249,7 @@ export default function BlogPost() {
 
               {/* Series Navigation */}
               <div className="mt-24 pt-12 border-t border-white/5">
-                <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-8">
+                <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.4em] mb-8">
                   Up_Next_In_The_Minimalist
                 </div>
                 <Link href="/blog/cdk-monorepo-mastery" className="block group">
