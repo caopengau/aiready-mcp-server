@@ -76,31 +76,9 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-purple/30 selection:text-cyber-purple font-sans">
+      <Navbar variant="post" />
+      <Navbar variant="post" />
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/logo.png"
-              alt="ClawMore Logo"
-              width={32}
-              height={32}
-              className="drop-shadow-[0_0_8px_rgba(188,0,255,0.6)]"
-            />
-            <span className="text-xl font-bold tracking-tight italic glow-text">
-              ClawMore
-            </span>
-          </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
-            <Link
-              href="/blog"
-              className="hover:text-cyber-purple transition-colors flex items-center gap-2"
-            >
-              <ArrowLeft className="w-3 h-3" /> Back to Journal
-            </Link>
-          </div>
-        </div>
-      </nav>
 
       {/* Article Header */}
       <header className="py-24 border-b border-white/5 relative overflow-hidden">

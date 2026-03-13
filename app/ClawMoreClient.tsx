@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import LeadForm from '../components/LeadForm';
+import Navbar from '../components/Navbar';
 
 interface ClawMoreClientProps {
   apiUrl: string;
@@ -37,68 +38,7 @@ export default function ClawMoreClient({ apiUrl }: ClawMoreClientProps) {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-blue/30 selection:text-cyber-blue font-sans">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Image
-              src="/logo.png"
-              alt="ClawMore Logo"
-              width={40}
-              height={40}
-              className="drop-shadow-[0_0_12px_rgba(0,224,255,0.8)]"
-            />
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight leading-none glow-text">
-                ClawMore
-              </span>
-              <span className="text-[8px] font-mono text-cyber-purple uppercase tracking-[0.2em] mt-0.5">
-                Neural_Node_v1.0
-              </span>
-            </div>
-          </div>
-          <div className="hidden lg:flex items-center gap-10 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
-            <Link
-              href="#features"
-              className="hover:text-cyber-blue transition-colors flex items-center gap-1.5"
-            >
-              <Layers className="w-3 h-3" /> Features
-            </Link>
-            <Link
-              href="#evolution"
-              className="hover:text-cyber-blue transition-colors flex items-center gap-1.5"
-            >
-              <RefreshCcw className="w-3 h-3" /> Evolution
-            </Link>
-            <Link
-              href="#pricing"
-              className="hover:text-cyber-blue transition-colors flex items-center gap-1.5"
-            >
-              <Zap className="w-3 h-3" /> Pricing
-            </Link>
-            <Link
-              href="/blog"
-              className="hover:text-cyber-purple transition-colors flex items-center gap-1.5"
-            >
-              <Activity className="w-3 h-3" /> Blog
-            </Link>
-            <div className="flex items-center gap-4 pl-4 border-l border-white/10">
-              <Link
-                href="https://github.com/caopengau/serverlessclaw"
-                className="px-4 py-2 rounded-sm bg-white/5 hover:bg-white/10 text-white transition-all flex items-center gap-2 border border-white/10"
-              >
-                <Code className="w-3 h-3" /> Source
-              </Link>
-              <div className="flex items-center gap-2 px-3 py-2 bg-cyber-blue/5 border border-cyber-blue/20 rounded-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyber-blue animate-pulse" />
-                <span className="text-cyber-blue text-[9px] font-black">
-                  LINK_ACTIVE
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="home" />
 
       <section className="relative min-h-[100vh] flex flex-col items-center justify-center overflow-hidden border-b border-white/5 isolate py-20">
         {/* Cinematic Background Image - STACKING FIX & MAXIMUM IMPACT */}

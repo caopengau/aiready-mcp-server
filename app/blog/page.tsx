@@ -15,6 +15,7 @@ import BlogHero from '../../components/BlogHero';
 import BlogCard from '../../components/BlogCard';
 import Modal from '../../components/Modal';
 import LeadForm from '../../components/LeadForm';
+import Navbar from '../../components/Navbar';
 
 const BLOG_POSTS = [
   {
@@ -132,54 +133,7 @@ export default function BlogIndex() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyber-purple/30 selection:text-cyber-purple font-sans">
-      {/* Navigation (Simple version for blog) */}
-      <nav className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-4">
-            <Image
-              src="/logo.png"
-              alt="ClawMore Logo"
-              width={32}
-              height={32}
-              className="drop-shadow-[0_0_8px_rgba(188,0,255,0.6)]"
-            />
-            <span className="text-xl font-bold tracking-tight italic glow-text">
-              ClawMore
-            </span>
-          </Link>
-          <div className="flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-zinc-300">
-            <Link
-              href="/#features"
-              className="hover:text-cyber-blue transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              href="/#pricing"
-              className="hover:text-cyber-blue transition-colors"
-            >
-              Pricing
-            </Link>
-            <Link href="/blog" className="text-cyber-purple font-black">
-              Blog
-            </Link>
-            <div className="flex items-center gap-4 pl-4 border-l border-white/10">
-              <Link
-                href="https://github.com/caopengau/serverlessclaw"
-                className="px-4 py-2 rounded-sm bg-white/5 hover:bg-white/10 text-white transition-all flex items-center gap-2 border border-white/10"
-              >
-                <Code className="w-3 h-3" /> Source
-              </Link>
-              <div className="flex items-center gap-2 px-3 py-2 bg-cyber-purple/5 border border-cyber-purple/20 rounded-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyber-purple animate-pulse" />
-                <span className="text-cyber-purple text-[9px] font-black">
-                  SYNC_ACTIVE
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="home" />
 
       <BlogHero />
 

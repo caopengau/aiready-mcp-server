@@ -31,6 +31,22 @@ body {
   text-shadow: 0 0 10px rgba(0, 255, 163, 0.3);
 }
 
+.glow-blue {
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.glow-purple {
+  text-shadow: 0 0 15px rgba(188, 0, 255, 0.5);
+}
+
+.hover\:glow-blue:hover {
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.6);
+}
+
+.hover\:glow-purple:hover {
+  text-shadow: 0 0 15px rgba(188, 0, 255, 0.6);
+}
+
 .cyber-border {
   border-left: 2px solid var(--color-cyber-green);
 }
