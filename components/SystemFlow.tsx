@@ -13,10 +13,10 @@ import 'reactflow/dist/style.css';
 
 const nodeStyles = {
   agent:
-    'px-4 py-2 shadow-md rounded-sm bg-black border border-cyber-purple/40 text-white font-mono text-[10px] uppercase tracking-widest',
-  bus: 'px-6 py-3 shadow-lg rounded-sm bg-cyber-purple/10 border-2 border-cyber-purple text-white font-black font-mono text-[12px] uppercase tracking-[0.3em]',
+    'px-4 py-2 shadow-[0_0_15px_rgba(255,255,255,0.05)] rounded-sm bg-zinc-900 border border-white/20 text-white font-mono text-[10px] uppercase tracking-widest',
+  bus: 'px-6 py-3 shadow-[0_0_20px_rgba(188,0,255,0.2)] rounded-sm bg-cyber-purple/20 border-2 border-cyber-purple text-white font-black font-mono text-[12px] uppercase tracking-[0.3em]',
   event:
-    'px-3 py-1 shadow-sm rounded-full bg-white/5 border border-white/10 text-zinc-400 font-mono text-[8px] uppercase tracking-tighter',
+    'px-3 py-1 shadow-sm rounded-full bg-zinc-800 border border-white/30 text-white font-mono text-[8px] uppercase tracking-tighter',
 };
 
 interface SystemFlowProps {
@@ -32,7 +32,7 @@ export default function SystemFlow({
 }: SystemFlowProps) {
   const defaultEdgeOptions = {
     animated: true,
-    style: { stroke: '#bc00ff', strokeWidth: 1 },
+    style: { stroke: '#bc00ff', strokeWidth: 2 },
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#bc00ff',
@@ -71,7 +71,7 @@ export default function SystemFlow({
         panOnScroll={false}
         zoomOnScroll={false}
       >
-        <Background color="#333" gap={20} />
+        <Background color="#222" gap={20} />
         <Controls
           showInteractive={false}
           className="opacity-20 hover:opacity-100 transition-opacity"
