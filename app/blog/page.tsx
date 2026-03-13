@@ -97,6 +97,16 @@ const BLOG_POSTS = [
     hash: 'omni-gate',
     category: 'OMNI_CHANNEL',
   },
+  {
+    slug: 'surviving-void-ephemeral-persistence',
+    title: 'Surviving the Void: Cross-Lifecycle Memory',
+    excerpt:
+      'How do you keep an AI agent from forgetting its purpose when its runtime is destroyed every 15 minutes? Exploring the S3 + DynamoDB state backbone.',
+    date: 'FEB 25, 2026',
+    readTime: '07 MIN',
+    hash: 'state-void',
+    category: 'EPHEMERAL_PERSISTENCE',
+  },
 ];
 
 export default function BlogIndex() {
