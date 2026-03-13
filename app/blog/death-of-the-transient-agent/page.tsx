@@ -15,8 +15,66 @@ import {
   Zap,
   ChevronRight,
 } from 'lucide-react';
+import BlogHero from '../../../components/BlogHero';
+import BlogCard from '../../../components/BlogCard';
 import Modal from '../../../components/Modal';
 import LeadForm from '../../../components/LeadForm';
+import SystemFlow from '../../../components/SystemFlow';
+
+const TRANSITION_NODES = [
+  {
+    id: 'user',
+    data: { label: '[HUMAN_INTENT]', type: 'agent' },
+    position: { x: 0, y: 0 },
+  },
+  {
+    id: 'chat',
+    data: { label: 'STATELESS_CHAT', type: 'event' },
+    position: { x: 200, y: -50 },
+  },
+  {
+    id: 'mutation',
+    data: { label: 'MUTABLE_LOGIC_COMMIT', type: 'bus' },
+    position: { x: 200, y: 50 },
+  },
+  {
+    id: 'infra',
+    data: { label: 'PROD_INFRASTRUCTURE', type: 'agent' },
+    position: { x: 450, y: 0 },
+  },
+];
+
+const TRANSITION_EDGES = [
+  {
+    id: 'e1',
+    source: 'user',
+    target: 'chat',
+    label: 'Ask',
+    animated: true,
+    style: { stroke: '#666' },
+  },
+  {
+    id: 'e2',
+    source: 'chat',
+    target: 'infra',
+    label: 'Manual Copy',
+    style: { stroke: '#ef4444', strokeDasharray: '5 5' },
+  },
+  {
+    id: 'e3',
+    source: 'user',
+    target: 'mutation',
+    label: 'Intent',
+    animated: true,
+  },
+  {
+    id: 'e4',
+    source: 'mutation',
+    target: 'infra',
+    label: 'Auto Deploy',
+    animated: true,
+  },
+];
 
 export default function BlogPost() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -115,6 +173,12 @@ export default function BlogPost() {
                     }
                   </div>
                 </section>
+
+                <SystemFlow
+                  nodes={TRANSITION_NODES}
+                  edges={TRANSITION_EDGES}
+                  height="300px"
+                />
 
                 <section>
                   <h2 className="text-3xl font-black tracking-tight mb-6 flex items-center gap-4">
