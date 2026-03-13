@@ -47,6 +47,26 @@ const BLOG_POSTS = [
     hash: 'bd95a79',
     category: 'SAFETY_GUARDS',
   },
+  {
+    slug: 'sst-ion-coder-loop',
+    title: 'SST Ion & The Coder Loop',
+    excerpt:
+      'Closing the gap between LLM reasoning and Pulumi-based deployment. How we achieve sub-second infrastructure mutations.',
+    date: 'MAR 07, 2026',
+    readTime: '07 MIN',
+    hash: 'a2eb83b',
+    category: 'JIT_INFRASTRUCTURE',
+  },
+  {
+    slug: 'ironclad-autonomy-safety-vpc',
+    title: 'Ironclad Autonomy: Safety & VPCs',
+    excerpt:
+      'Explaining our multi-layered approach to recursion guards and context isolation to ensure autonomous systems never run away.',
+    date: 'MAR 05, 2026',
+    readTime: '06 MIN',
+    hash: 'bd95a79',
+    category: 'SAFETY_GUARDS',
+  },
 ];
 
 export default function BlogIndex() {
