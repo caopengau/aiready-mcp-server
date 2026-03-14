@@ -69,7 +69,7 @@ const Post = () => (
 
     <p>
       By linking our <strong>Fragmentation Score</strong> to real-world model
-      pricing (Claude 3.7, GPT-4o), we can show you exactly how much money
+      pricing (Claude 4.6, GPT-5.4), we can show you exactly how much money
       you’re leaving on the table.
     </p>
     <ul className="list-disc pl-6 mb-8 space-y-3">

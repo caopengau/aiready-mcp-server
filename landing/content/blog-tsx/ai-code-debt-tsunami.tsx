@@ -92,8 +92,8 @@ const Post = () => (
 
     <h3>1. Knowledge Cutoff Gaps (The Outdated Pattern Problem)</h3>
     <p>
-      AI models have training cutoffs. GPT-4's knowledge ends in April 2023.
-      Claude's is a bit later. But your best practices evolved last month.
+      AI models have training cutoffs. GPT-5.4's knowledge ends in late 2025.
+      Claude 4.6's is a bit later. But your best practices evolved last month.
     </p>
     <p>
       <strong>The result:</strong> AI confidently suggests patterns that were
@@ -218,8 +218,8 @@ class ReceiptValidator {
 
     <h3>4. Context Fragmentation (The Token Budget Problem)</h3>
     <p>
-      AI models have limited context windows. GPT-4 Turbo has 128K tokens.
-      Claude 3.5 has 200K. Sounds like a lot, right?
+      AI models have limited context windows. GPT-5.4 has 512K tokens. Gemini
+      3.1 has 2M. Sounds like a lot, right?
     </p>
     <p>Wrong.</p>
     <p>
@@ -254,8 +254,8 @@ export const getUser = async (id) => {
     <p>
       Now multiply this across your entire codebase. We discovered that some of
       our "simple" user management operations were costing 15,000+ tokens just
-      for AI to understand the context. That's 10% of GPT-4's context window for
-      one feature domain.
+      for AI to understand the context. That's 3% of GPT-5.4's context window
+      for one feature domain.
     </p>
     <p>
       The result? AI gives incomplete answers, misses important context, or

@@ -50,7 +50,7 @@ const ContextWindowCrisis: React.FC = () => (
         per request.
       </p>
       <p className="mb-2">
-        At GPT-4 pricing (~$0.03/1K tokens), that’s{' '}
+        At GPT-5.4 pricing (~$0.01/1K tokens), that’s{' '}
         <span className="font-bold text-red-600">
           $0.37 per code suggestion
         </span>
