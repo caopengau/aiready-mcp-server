@@ -11,6 +11,10 @@
 import { getParser, estimateTokens } from '@aiready/core';
 import { resolve, relative, dirname, join } from 'path';
 import fs from 'fs';
+import {
+  calculateImportDepthFromEdges,
+  detectGraphCyclesFromFile,
+} from '../utils/dependency-graph-utils';
 
 export interface PythonContextMetrics {
   file: string;
@@ -85,7 +89,7 @@ export async function analyzePythonContext(
 
       // Calculate metrics
       const linesOfCode = code.split('\n').length;
-      const importDepth = await calculatePythonImportDepth(
+      const importDepth = calculateImportDepthFromEdges(
         file,
         dependencyGraph,
         new Set()
@@ -96,10 +100,10 @@ export async function analyzePythonContext(
         dependencyGraph
       );
       const cohesion = calculatePythonCohesion(exports, imports);
-      const circularDependencies = detectCircularDependencies(
+      const circularDependencies = detectGraphCyclesFromFile(
         file,
         dependencyGraph
-      );
+      ).map((cycle) => cycle.join(' -> '));
 
       results.push({
         file,
@@ -213,40 +217,6 @@ function resolvePythonImport(
 }
 
 /**
- * Calculate import depth for a Python file
- */
-async function calculatePythonImportDepth(
-  file: string,
-  dependencyGraph: Map<string, Set<string>>,
-  visited: Set<string>,
-  depth: number = 0
-): Promise<number> {
-  if (visited.has(file)) {
-    return depth; // Circular dependency, stop here
-  }
-
-  visited.add(file);
-  const dependencies = dependencyGraph.get(file) || new Set();
-
-  if (dependencies.size === 0) {
-    return depth;
-  }
-
-  let maxDepth = depth;
-  for (const dep of dependencies) {
-    const depDepth = await calculatePythonImportDepth(
-      dep,
-      dependencyGraph,
-      new Set(visited),
-      depth + 1
-    );
-    maxDepth = Math.max(maxDepth, depDepth);
-  }
-
-  return maxDepth;
-}
-
-/**
  * Estimate context budget (tokens needed for file + direct deps)
  */
 function estimateContextBudget(
@@ -302,43 +272,4 @@ function calculatePythonCohesion(
   }
 
   return Math.min(1, Math.max(0, cohesion));
-}
-
-/**
- * Detect circular dependencies
- */
-function detectCircularDependencies(
-  file: string,
-  dependencyGraph: Map<string, Set<string>>
-): string[] {
-  const circular: string[] = [];
-  const visited = new Set<string>();
-  const recursionStack = new Set<string>();
-
-  function dfs(current: string, path: string[]): void {
-    if (recursionStack.has(current)) {
-      // Found a cycle
-      const cycleStart = path.indexOf(current);
-      const cycle = path.slice(cycleStart).concat([current]);
-      circular.push(cycle.join(' → '));
-      return;
-    }
-
-    if (visited.has(current)) {
-      return;
-    }
-
-    visited.add(current);
-    recursionStack.add(current);
-
-    const dependencies = dependencyGraph.get(current) || new Set();
-    for (const dep of dependencies) {
-      dfs(dep, [...path, current]);
-    }
-
-    recursionStack.delete(current);
-  }
-
-  dfs(file, []);
-  return [...new Set(circular)]; // Deduplicate
 }

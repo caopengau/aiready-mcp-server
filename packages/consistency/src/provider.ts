@@ -1,11 +1,8 @@
 import {
-  ToolProvider,
-  ToolName,
-  SpokeOutput,
-  ScanOptions,
-  ToolScoringOutput,
   AnalysisResult,
-  SpokeOutputSchema,
+  createProvider,
+  ToolName,
+  ScanOptions,
 } from '@aiready/core';
 import { analyzeConsistency } from './analyzer';
 import { calculateConsistencyScore } from './scoring';
@@ -14,25 +11,21 @@ import { ConsistencyOptions, ConsistencyIssue } from './types';
 /**
  * Consistency Tool Provider
  */
-export const ConsistencyProvider: ToolProvider = {
+export const ConsistencyProvider = createProvider({
   id: ToolName.NamingConsistency,
   alias: ['consistency', 'naming', 'standards'],
-
-  async analyze(options: ScanOptions): Promise<SpokeOutput> {
-    const report = await analyzeConsistency(options as ConsistencyOptions);
-
-    return SpokeOutputSchema.parse({
-      results: report.results as AnalysisResult[],
-      summary: report.summary,
-      metadata: {
-        toolName: ToolName.NamingConsistency,
-        version: '0.16.5',
-        timestamp: new Date().toISOString(),
-      },
-    });
+  version: '0.16.5',
+  defaultWeight: 14,
+  async analyzeReport(options: ScanOptions) {
+    return analyzeConsistency(options as ConsistencyOptions);
   },
-
-  score(output: SpokeOutput, options: ScanOptions): ToolScoringOutput {
+  getResults(report) {
+    return report.results as AnalysisResult[];
+  },
+  getSummary(report) {
+    return report.summary;
+  },
+  score(output, options) {
     const results = output.results as AnalysisResult[];
     const allIssues = results.flatMap((r) => r.issues as ConsistencyIssue[]);
     const totalFiles = (output.summary as any).filesAnalyzed || results.length;
@@ -43,6 +36,4 @@ export const ConsistencyProvider: ToolProvider = {
       (options as any).costConfig
     );
   },
-
-  defaultWeight: 14,
-};
+});

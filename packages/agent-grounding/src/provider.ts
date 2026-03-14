@@ -1,11 +1,8 @@
 import {
-  ToolProvider,
-  ToolName,
-  SpokeOutput,
-  ScanOptions,
-  ToolScoringOutput,
   AnalysisResult,
-  SpokeOutputSchema,
+  createProvider,
+  ToolName,
+  ScanOptions,
 } from '@aiready/core';
 import { analyzeAgentGrounding } from './analyzer';
 import { calculateGroundingScore } from './scoring';
@@ -14,44 +11,35 @@ import { AgentGroundingOptions, AgentGroundingReport } from './types';
 /**
  * Agent Grounding Tool Provider
  */
-export const AgentGroundingProvider: ToolProvider = {
+export const AgentGroundingProvider = createProvider({
   id: ToolName.AgentGrounding,
   alias: ['agent-grounding', 'grounding', 'navigation'],
-
-  async analyze(options: ScanOptions): Promise<SpokeOutput> {
-    const report = await analyzeAgentGrounding(
-      options as AgentGroundingOptions
-    );
-
-    const results: AnalysisResult[] = report.issues.map((i) => ({
-      fileName: i.location.file,
-      issues: [i] as any[],
+  version: '0.9.5',
+  defaultWeight: 10,
+  async analyzeReport(options: ScanOptions) {
+    return analyzeAgentGrounding(options as AgentGroundingOptions);
+  },
+  getResults(report): AnalysisResult[] {
+    return report.issues.map((issue) => ({
+      fileName: issue.location.file,
+      issues: [issue] as any[],
       metrics: {
         agentGroundingScore: report.summary.score,
       },
     }));
-
-    return SpokeOutputSchema.parse({
-      results,
-      summary: report.summary,
-      metadata: {
-        toolName: ToolName.AgentGrounding,
-        version: '0.9.5',
-        timestamp: new Date().toISOString(),
-        rawData: report.rawData,
-      },
-    });
   },
-
-  score(output: SpokeOutput, options: ScanOptions): ToolScoringOutput {
+  getSummary(report) {
+    return report.summary;
+  },
+  getMetadata(report) {
+    return { rawData: report.rawData };
+  },
+  score(output) {
     const report = {
       summary: output.summary,
       rawData: (output.metadata as any).rawData,
       recommendations: (output.summary as any).recommendations || [],
     } as unknown as AgentGroundingReport;
-
     return calculateGroundingScore(report);
   },
-
-  defaultWeight: 10,
-};
+});

@@ -1,11 +1,8 @@
 import {
-  ToolProvider,
-  ToolName,
-  SpokeOutput,
-  ScanOptions,
-  ToolScoringOutput,
   AnalysisResult,
-  SpokeOutputSchema,
+  createProvider,
+  ToolName,
+  ScanOptions,
 } from '@aiready/core';
 import { analyzeTestability } from './analyzer';
 import { calculateTestabilityScore } from './scoring';
@@ -14,42 +11,35 @@ import { TestabilityOptions, TestabilityReport } from './types';
 /**
  * Testability Tool Provider
  */
-export const TestabilityProvider: ToolProvider = {
+export const TestabilityProvider = createProvider({
   id: ToolName.TestabilityIndex,
   alias: ['testability', 'tests', 'verification'],
-
-  async analyze(options: ScanOptions): Promise<SpokeOutput> {
-    const report = await analyzeTestability(options as TestabilityOptions);
-
-    const results: AnalysisResult[] = report.issues.map((i) => ({
-      fileName: i.location.file,
-      issues: [i] as any[],
+  version: '0.2.5',
+  defaultWeight: 10,
+  async analyzeReport(options: ScanOptions) {
+    return analyzeTestability(options as TestabilityOptions);
+  },
+  getResults(report): AnalysisResult[] {
+    return report.issues.map((issue) => ({
+      fileName: issue.location.file,
+      issues: [issue] as any[],
       metrics: {
         testabilityScore: report.summary.score,
       },
     }));
-
-    return SpokeOutputSchema.parse({
-      results,
-      summary: report.summary,
-      metadata: {
-        toolName: ToolName.TestabilityIndex,
-        version: '0.2.5',
-        timestamp: new Date().toISOString(),
-        rawData: report.rawData,
-      },
-    });
   },
-
-  score(output: SpokeOutput, options: ScanOptions): ToolScoringOutput {
+  getSummary(report) {
+    return report.summary;
+  },
+  getMetadata(report) {
+    return { rawData: report.rawData };
+  },
+  score(output) {
     const report = {
       summary: output.summary,
       rawData: (output.metadata as any).rawData,
       recommendations: (output.summary as any).recommendations || [],
     } as unknown as TestabilityReport;
-
     return calculateTestabilityScore(report);
   },
-
-  defaultWeight: 10,
-};
+});

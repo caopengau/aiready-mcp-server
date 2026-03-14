@@ -1,5 +1,10 @@
 import { estimateTokens, parseFileExports } from '@aiready/core';
 import { singularize } from './utils/string-utils';
+import {
+  calculateImportDepthFromEdges,
+  detectGraphCycles,
+  getTransitiveDependenciesFromEdges,
+} from './utils/dependency-graph-utils';
 import type { DependencyGraph, DependencyNode } from './types';
 import {
   buildCoUsageMatrix,
@@ -178,23 +183,7 @@ export function calculateImportDepth(
   visited = new Set<string>(),
   depth = 0
 ): number {
-  if (visited.has(file)) return depth;
-
-  const dependencies = graph.edges.get(file);
-  if (!dependencies || dependencies.size === 0) return depth;
-
-  visited.add(file);
-  let maxDepth = depth;
-
-  for (const dep of dependencies) {
-    maxDepth = Math.max(
-      maxDepth,
-      calculateImportDepth(dep, graph, visited, depth + 1)
-    );
-  }
-
-  visited.delete(file);
-  return maxDepth;
+  return calculateImportDepthFromEdges(file, graph.edges, visited, depth);
 }
 
 /**
@@ -205,19 +194,7 @@ export function getTransitiveDependencies(
   graph: DependencyGraph,
   visited = new Set<string>()
 ): string[] {
-  if (visited.has(file)) return [];
-
-  visited.add(file);
-  const dependencies = graph.edges.get(file);
-  if (!dependencies || dependencies.size === 0) return [];
-
-  const allDeps: string[] = [];
-  for (const dep of dependencies) {
-    allDeps.push(dep);
-    allDeps.push(...getTransitiveDependencies(dep, graph, visited));
-  }
-
-  return [...new Set(allDeps)];
+  return getTransitiveDependenciesFromEdges(file, graph.edges, visited);
 }
 
 /**
@@ -247,40 +224,5 @@ export function calculateContextBudget(
  * Detect circular dependencies
  */
 export function detectCircularDependencies(graph: DependencyGraph): string[][] {
-  const cycles: string[][] = [];
-  const visited = new Set<string>();
-  const recursionStack = new Set<string>();
-
-  function dfs(file: string, path: string[]): void {
-    if (recursionStack.has(file)) {
-      const cycleStart = path.indexOf(file);
-      if (cycleStart !== -1) {
-        cycles.push([...path.slice(cycleStart), file]);
-      }
-      return;
-    }
-
-    if (visited.has(file)) return;
-
-    visited.add(file);
-    recursionStack.add(file);
-    path.push(file);
-
-    const dependencies = graph.edges.get(file);
-    if (dependencies) {
-      for (const dep of dependencies) {
-        dfs(dep, [...path]);
-      }
-    }
-
-    recursionStack.delete(file);
-  }
-
-  for (const file of graph.nodes.keys()) {
-    if (!visited.has(file)) {
-      dfs(file, []);
-    }
-  }
-
-  return cycles;
+  return detectGraphCycles(graph.edges);
 }
