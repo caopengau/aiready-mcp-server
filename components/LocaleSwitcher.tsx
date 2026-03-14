@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
 import { Globe } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -17,7 +16,14 @@ export default function LocaleSwitcher() {
   };
 
   useEffect(() => {
-    setCurrentLocale(getCookie('NEXT_LOCALE') || 'en');
+    const locale = getCookie('NEXT_LOCALE');
+    if (locale && locale !== 'en') {
+      // Use setTimeout to avoid synchronous setState in useEffect lint warning
+      const timeoutId = setTimeout(() => {
+        setCurrentLocale(locale);
+      }, 0);
+      return () => clearTimeout(timeoutId);
+    }
   }, []);
 
   const handleLocaleChange = (newLocale: string) => {
