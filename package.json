@@ -1,12 +1,13 @@
 {
   "name": "@aiready/mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AIReady Model Context Protocol (MCP) Server",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "bin": {
-    "aiready-mcp": "./dist/index.js"
+    "aiready-mcp": "./dist/index.js",
+    "mcp-server": "./dist/index.js"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --clean --dts",
