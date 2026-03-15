@@ -121,7 +121,7 @@ export default function ClawMoreClient({ apiUrl, dict }: ClawMoreClientProps) {
           </div>
 
           {/* Cache-buster: v2-gradient */}
-          <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] font-black tracking-tighter mb-8 sm:mb-10 bg-gradient-to-r from-[#00e0ff] to-[#bc00ff] bg-clip-text text-transparent leading-[1.1] sm:leading-[1.1] pb-3 sm:pb-4 drop-shadow-[0_10px_60px_rgba(0,0,0,1)]">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-8 sm:mb-10 bg-gradient-to-r from-[#00e0ff] to-[#bc00ff] bg-clip-text text-transparent leading-[1.1] sm:leading-[1.1] pb-3 sm:pb-4 drop-shadow-[0_10px_60px_rgba(0,0,0,1)]">
             {dict.hero.title1}
             <br />
             <span className="italic">{dict.hero.title2}</span>{' '}
