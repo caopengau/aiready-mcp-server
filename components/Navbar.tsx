@@ -67,9 +67,6 @@ export default function Navbar({ variant = 'home', dict }: NavbarProps) {
             >
               ClawMore
             </span>
-            <span className="hidden sm:block text-[8px] font-mono text-cyber-purple uppercase tracking-[0.2em] mt-0.5">
-              Neural_Node_v1.0
-            </span>
           </div>
         </Link>
 
