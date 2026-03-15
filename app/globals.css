@@ -16,6 +16,7 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -23,6 +24,26 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+@keyframes current-flow {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-current-flow {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0.05) 25%,
+    rgba(0, 224, 255, 0.2) 50%,
+    rgba(0, 224, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: current-flow 3s infinite linear;
 }
 
 .glass-card {

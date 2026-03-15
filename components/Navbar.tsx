@@ -14,6 +14,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import LocaleSwitcher from './LocaleSwitcher';
 
 interface NavbarProps {
@@ -162,73 +163,81 @@ export default function Navbar({ variant = 'home', dict }: NavbarProps) {
         </div>
       </div>
 
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-white/10 bg-black/80 backdrop-blur-xl">
-          <div className="container mx-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-2">
-            {variant === 'home' ? (
-              <>
-                <Link
-                  href="/#features"
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-blue transition-colors"
-                >
-                  <Layers className="w-3.5 h-3.5" />{' '}
-                  {dict?.navbar?.features || 'Features'}
-                </Link>
-                <Link
-                  href="/#evolution"
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-blue transition-colors"
-                >
-                  <RefreshCcw className="w-3.5 h-3.5" />{' '}
-                  {dict?.navbar?.evolution || 'Evolution'}
-                </Link>
-                <Link
-                  href="/#pricing"
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-blue transition-colors"
-                >
-                  <Zap className="w-3.5 h-3.5" />{' '}
-                  {dict?.navbar?.pricing || 'Pricing'}
-                </Link>
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, y: -20 }}
+            animate={{ opacity: 1, height: 'auto', y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="absolute top-full left-0 w-full lg:hidden border-t border-white/10 bg-black/95 backdrop-blur-2xl shadow-2xl z-50 overflow-hidden"
+          >
+            <div className="container mx-auto px-4 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] space-y-3">
+              {variant === 'home' ? (
+                <>
+                  <Link
+                    href="/#features"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-blue transition-colors"
+                  >
+                    <Layers className="w-3.5 h-3.5" />{' '}
+                    {dict?.navbar?.features || 'Features'}
+                  </Link>
+                  <Link
+                    href="/#evolution"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-blue transition-colors"
+                  >
+                    <RefreshCcw className="w-3.5 h-3.5" />{' '}
+                    {dict?.navbar?.evolution || 'Evolution'}
+                  </Link>
+                  <Link
+                    href="/#pricing"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-blue transition-colors"
+                  >
+                    <Zap className="w-3.5 h-3.5" />{' '}
+                    {dict?.navbar?.pricing || 'Pricing'}
+                  </Link>
+                  <Link
+                    href="/blog"
+                    onClick={closeMobileMenu}
+                    className={`flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 transition-colors ${
+                      isBlog
+                        ? 'text-cyber-purple glow-purple font-black'
+                        : 'text-zinc-200 hover:text-cyber-purple'
+                    }`}
+                  >
+                    <Activity className="w-3.5 h-3.5" />{' '}
+                    {dict?.navbar?.blog || 'Blog'}
+                  </Link>
+                </>
+              ) : (
                 <Link
                   href="/blog"
                   onClick={closeMobileMenu}
-                  className={`flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 transition-colors ${
-                    isBlog
-                      ? 'text-cyber-purple glow-purple font-black'
-                      : 'text-zinc-200 hover:text-cyber-purple'
-                  }`}
+                  className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-purple transition-colors"
                 >
-                  <Activity className="w-3.5 h-3.5" />{' '}
-                  {dict?.navbar?.blog || 'Blog'}
+                  <ArrowLeft className="w-3.5 h-3.5" />{' '}
+                  {dict?.navbar?.backToJournal || 'Back to Journal'}
                 </Link>
-              </>
-            ) : (
-              <Link
-                href="/blog"
-                onClick={closeMobileMenu}
-                className="flex items-center gap-2 px-3 py-3 rounded-sm border border-white/10 bg-white/3 text-zinc-200 hover:text-cyber-purple transition-colors"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />{' '}
-                {dict?.navbar?.backToJournal || 'Back to Journal'}
-              </Link>
-            )}
+              )}
 
-            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
-              <LocaleSwitcher />
-              <Link
-                href="https://github.com/caopengau/serverlessclaw"
-                onClick={closeMobileMenu}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-white/15 bg-white/5 text-zinc-100 hover:bg-white/10 transition-colors"
-              >
-                <Code className="w-3.5 h-3.5" />{' '}
-                {dict?.navbar?.source || 'Source'}
-              </Link>
+              <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-3">
+                <LocaleSwitcher />
+                <Link
+                  href="https://github.com/caopengau/serverlessclaw"
+                  onClick={closeMobileMenu}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-sm border border-white/15 bg-white/5 text-zinc-100 hover:bg-white/10 transition-colors"
+                >
+                  <Code className="w-3.5 h-3.5" />{' '}
+                  {dict?.navbar?.source || 'Source'}
+                </Link>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
