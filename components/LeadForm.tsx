@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Send, CheckCircle2 } from 'lucide-react';
+import { LeadSource } from '@aiready/core/client';
 
 interface LeadFormProps {
   type: 'beta' | 'waitlist';
@@ -43,6 +44,10 @@ export default function LeadForm({
           name,
           interest: type.toUpperCase(),
           notes,
+          source:
+            type === 'beta'
+              ? LeadSource.ClawMoreBeta
+              : LeadSource.ClawMoreWaitlist,
         }),
       });
 

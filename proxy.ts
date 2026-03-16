@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { auth } from './auth';
 
 const locales = ['en', 'zh'];
 const defaultLocale = 'en';
@@ -42,7 +43,7 @@ function getLocale(request: NextRequest) {
   return defaultLocale;
 }
 
-export function proxy(request: NextRequest) {
+export const proxy = auth((request) => {
   const pathname = request.nextUrl.pathname;
 
   // Skip public files and API routes
@@ -75,7 +76,7 @@ export function proxy(request: NextRequest) {
   response.headers.set('X-NEXT-LOCALE', locale);
 
   return response;
-}
+});
 
 export const config = {
   // Matcher ignoring `/_next/` and `/api/`

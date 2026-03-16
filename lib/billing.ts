@@ -1,0 +1,90 @@
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2025-01-27-acacia' as any,
+});
+
+/**
+ * Reports usage for a metered subscription item (e.g., the Evolution Tax).
+ */
+export async function reportMeteredUsage(
+  subscriptionItemId: string,
+  quantity: number = 1
+) {
+  try {
+    // Use any as the Stripe Node SDK version variations can have different method locations for usage records
+    await (stripe.subscriptionItems as any).createUsageRecord(
+      subscriptionItemId,
+      {
+        quantity,
+        timestamp: Math.floor(Date.now() / 1000),
+        action: 'increment',
+      }
+    );
+    console.log(
+      `Reported metered usage (${quantity}) for ${subscriptionItemId}`
+    );
+  } catch (error) {
+    console.error('Error reporting metered usage to Stripe:', error);
+    throw error;
+  }
+}
+
+/**
+ * Adds a one-time charge (invoice item) to the customer's next invoice.
+ * Used for pass-through compute overages.
+ */
+export async function reportOverageCharge(
+  customerId: string,
+  amountInCents: number,
+  description: string
+) {
+  try {
+    await stripe.invoiceItems.create({
+      customer: customerId,
+      amount: amountInCents,
+      currency: 'usd',
+      description,
+    });
+    console.log(
+      `Reported overage charge of $${(amountInCents / 100).toFixed(2)} for ${customerId}`
+    );
+  } catch (error) {
+    console.error('Error reporting overage charge to Stripe:', error);
+    throw error;
+  }
+}
+
+/**
+ * Creates a Stripe Checkout Session for a pre-paid "AI Fuel Pack".
+ */
+export async function createFuelPackCheckout(
+  customerId: string,
+  successUrl: string,
+  cancelUrl: string
+) {
+  return await stripe.checkout.sessions.create({
+    customer: customerId,
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'ClawMore AI Fuel Pack ($10.00)',
+            description: 'Adds $10.00 to your pre-paid AI token balance.',
+          },
+          unit_amount: 1000,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    metadata: {
+      type: 'fuel_pack_refill',
+      amountCents: '1000',
+    },
+  });
+}

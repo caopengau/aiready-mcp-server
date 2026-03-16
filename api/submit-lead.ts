@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { LeadSubmissionSchema, LeadSource } from '@aiready/core/client';
 
 const s3 = new S3Client({});
 const sns = new SNSClient({});
@@ -28,14 +29,26 @@ export const handler = async (event: any) => {
       throw new Error('Missing body');
     }
 
-    const { email, name, interest, notes } = JSON.parse(event.body);
+    const body = JSON.parse(event.body);
 
-    if (!email) {
+    // Validate using @aiready/core schema
+    const validationResult = LeadSubmissionSchema.safeParse(body);
+
+    if (!validationResult.success) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Email is required' }),
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          error: 'Validation failed',
+          details: validationResult.error.format(),
+        }),
       };
     }
+
+    const { email, name, interest, notes, source } = validationResult.data;
 
     const leadId = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const timestamp = new Date().toISOString();
@@ -43,18 +56,19 @@ export const handler = async (event: any) => {
     const leadData = {
       id: leadId,
       email,
-      name: name || 'Anonymous',
-      interest: interest || 'General',
-      notes: notes || '',
+      name,
+      interest,
+      notes,
       timestamp,
-      source: 'clawmore-hero',
+      source: source || LeadSource.ClawMoreHero,
+      status: 'new',
     };
 
     // Save to S3
     await s3.send(
       new PutObjectCommand({
         Bucket: bucketName,
-        Key: `leads/${interest || 'general'}/${leadId}.json`,
+        Key: `leads/${interest.toLowerCase()}/${leadId}.json`,
         Body: JSON.stringify(leadData, null, 2),
         ContentType: 'application/json',
       })
