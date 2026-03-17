@@ -76,7 +76,20 @@ pre-push: ## Run pre-push checks (AIReady scan)
 	@if [ "$$SKIP_PRE_PUSH" = "true" ]; then \
 		$(call log_info,⏭️  Skipping AIReady pre-push scan (SKIP_PRE_PUSH=true)); \
 	else \
-		$(call log_step,🚀 Running AIReady pre-push scan (Threshold: 80)...); \
+		$(call log_step,🔍 Checking for un-synced spoke changes...); \
+		SPOKE_PATTERN="^(packages/|landing/|clawmore/|serverlessclaw/|vscode-extension/|action-marketplace/)"; \
+		CHANGED_SPOKES=$$(git diff --name-only origin/$(TARGET_BRANCH) 2>/dev/null | grep -E "$$SPOKE_PATTERN" | cut -d/ -f1-2 | sort -u); \
+		if [ -n "$$CHANGED_SPOKES" ]; then \
+			$(call separator,$(RED)); \
+			$(call log_error,Spoke changes detected! Use 'make sync' instead of 'git push' to update standalone repos.); \
+			echo "$$CHANGED_SPOKES" | sed 's/^/   - /'; \
+			$(call separator,$(RED)); \
+			echo ""; \
+			echo "👉 To fix this, run: make sync"; \
+			echo ""; \
+			exit 1; \
+		fi; \
+		$(call log_step,🚀 Running AIReady pre-push scan (Threshold: 75)...); \
 		aiready scan . --threshold 75; \
 	fi
 
