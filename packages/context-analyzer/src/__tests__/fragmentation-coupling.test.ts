@@ -31,8 +31,11 @@ describe('fragmentation coupling discount', () => {
       files.map((f) => f.file),
       'billing'
     );
-    // With no import similarity the coupling discount should be 0 -> fragmentation unchanged
-    expect(cluster!.fragmentationScore).toBeCloseTo(base, 6);
+    // Adjusted fragmentation includes classification multiplier (0.3 for COHESIVE_MODULE)
+    const expected = base * 0.3;
+
+    // Allow small FP tolerance
+    expect(cluster!.fragmentationScore).toBeCloseTo(expected, 6);
   });
 
   it('applies up-to-20% discount when files share identical imports', () => {
@@ -60,7 +63,7 @@ describe('fragmentation coupling discount', () => {
       files.map((f) => f.file),
       'billing'
     );
-    const expected = base * 0.8; // full cohesion => 20% discount
+    const expected = base * 0.8 * 0.3; // full cohesion => 20% discount AND 0.3 classification multiplier
 
     // Allow small FP tolerance
     expect(cluster!.fragmentationScore).toBeCloseTo(expected, 6);
