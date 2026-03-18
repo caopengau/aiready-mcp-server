@@ -48,7 +48,7 @@ We maintain control through **Tiered Infrastructure Governance**.
 - **Curated Evolution (IP Shield)**: The "Harvester" uses **Structured Extraction** (JSON Schema) to pull only the "DNA" of an improvement. By forcing a schema that only allows logic and rationale, we create a mathematical "Air-Gap" that prevents client secrets from leaking.
 - **Management Plane Review**: All proposals land in the **ClawMore Dashboard** for unified curation. This keeps the Mother repo's `main` branch protected from experimental or messy local optimizations until they are vetted and promoted.
 
-- **Harvester Injection**: The "Harvester" agent is NOT included in the Mother `serverlessclaw` repo. It utilizes GPT-5-mini for cost-effective, high-volume scanning of Spokes, ensuring the Mother repo stays lean and focused on the product.
+- **Harvester Injection**: The "Harvester" agent is NOT included in the Mother `serverlessclaw` repo. It utilizes gpt-5.4-mini for cost-effective, high-volume scanning of Spokes, ensuring the Mother repo stays lean and focused on the product.
 
 ---
 

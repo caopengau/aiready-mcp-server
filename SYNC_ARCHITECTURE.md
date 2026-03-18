@@ -41,7 +41,7 @@ While `git subtree` is the primitive, our architecture wraps it in a governance 
 
 ### **B. Spoke → Hub (The Contribution)**
 
-1.  **Opt-in Check**: The **Harvester** (GPT-5-mini) only scans Spokes that have explicitly opted into the "Co-evolution" protocol.
+1.  **Opt-in Check**: The **Harvester** (gpt-5.4-mini) only scans Spokes that have explicitly opted into the "Co-evolution" protocol.
 2.  **Optimization Detection**: Identifies a successful refactor or optimization in the Spoke.
 3.  **Structured Extraction**: Uses a **Strict JSON Schema** to extract only the "Innovation Pattern" (Logic, Rationale, and Abstracted Diff).
     This ensures NO client secrets, PII, or branding can ever be part of the output.
@@ -74,12 +74,12 @@ While `git subtree` is the primitive, our architecture wraps it in a governance 
 
 We shift from manual Makefiles to an **Autonomous Sync Swarm**:
 
-| Agent Role      | Responsibility                                            |
-| :-------------- | :-------------------------------------------------------- |
-| **Broadcaster** | Monitors Hub commits and initiates Spoke syncs.           |
-| **Validator**   | Runs test suites in Spokes post-sync (uses GPT-5.4).      |
-| **Harvester**   | Management-plane agent scanning Spokes (uses GPT-5-mini). |
-| **Janitor**     | Cleans up sync branches and monitors repo health.         |
+| Agent Role      | Responsibility                                              |
+| :-------------- | :---------------------------------------------------------- |
+| **Broadcaster** | Monitors Hub commits and initiates Spoke syncs.             |
+| **Validator**   | Runs test suites in Spokes post-sync (uses GPT-5.4).        |
+| **Harvester**   | Management-plane agent scanning Spokes (uses gpt-5.4-mini). |
+| **Janitor**     | Cleans up sync branches and monitors repo health.           |
 
 ### **The "Injected" Harvester Pattern**
 
