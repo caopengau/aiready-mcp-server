@@ -9,8 +9,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: 'Admin Password', type: 'password' },
       },
       async authorize(credentials) {
-        const adminPassword =
-          process.env.ADMIN_PASSWORD || 'clawmore-admin-2026';
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        if (!adminPassword) {
+          if (process.env.NODE_ENV === 'production') {
+            throw new Error(
+              'ADMIN_PASSWORD environment variable is required in production'
+            );
+          }
+          // Default for dev only if not production
+          return null;
+        }
+
         const isCorrectPassword = credentials?.password === adminPassword;
 
         // Hard-coded restriction to specific admin email
