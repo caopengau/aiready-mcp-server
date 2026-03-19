@@ -76,7 +76,8 @@ export default function BlogPost() {
       '@type': 'Person',
       name: 'Architect of Evolution',
     },
-    image: 'https://clawmore.getaiready.dev/blog-assets/sst-ion-coder-loop.png',
+    image:
+      'https://clawmore.getaiready.dev/blog-assets/openclaw-chronicles-04-agentskills.png',
     url: 'https://clawmore.getaiready.dev/blog/openclaw-chronicles-04-agentskills',
   };
 
@@ -117,7 +118,7 @@ export default function BlogPost() {
 
             <div className="mt-12 relative aspect-[21/9] w-full overflow-hidden border border-white/10 rounded-sm group">
               <img
-                src="/blog-assets/sst-ion-coder-loop.png"
+                src="/blog-assets/openclaw-chronicles-04-agentskills.png"
                 alt="AgentSkills Execution System"
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
               />

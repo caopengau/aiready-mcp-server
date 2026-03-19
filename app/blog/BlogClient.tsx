@@ -19,7 +19,7 @@ const BLOG_POSTS = [
     hash: 'future',
     category: 'CHRONICLES',
     image:
-      'https://clawmore.getaiready.dev/blog-assets/bridge-pattern-ephemeral-persistent.png',
+      'https://clawmore.getaiready.dev/blog-assets/openclaw-chronicles-12-future.png',
   },
   {
     slug: 'openclaw-chronicles-11-sync-architecture',
@@ -31,7 +31,7 @@ const BLOG_POSTS = [
     hash: 'clawsync',
     category: 'CHRONICLES',
     image:
-      'https://clawmore.getaiready.dev/blog-assets/eventbridge-the-neural-spine.png',
+      'https://clawmore.getaiready.dev/blog-assets/openclaw-chronicles-11-sync-architecture.png',
   },
   {
     slug: 'openclaw-chronicles-10-mutation-tax',
@@ -138,7 +138,7 @@ const BLOG_POSTS = [
     hash: 'localfirst',
     category: 'CHRONICLES',
     image:
-      'https://clawmore.getaiready.dev/blog-assets/surviving-void-ephemeral-persistence.png',
+      'https://clawmore.getaiready.dev/blog-assets/death-of-the-transient-agent.png',
   },
   {
     slug: 'openclaw-chronicles-01-origin-story',
@@ -149,8 +149,7 @@ const BLOG_POSTS = [
     readTime: '8 min read',
     hash: 'origin',
     category: 'CHRONICLES',
-    image:
-      'https://clawmore.getaiready.dev/blog-assets/openclaw-101-agentic-revolution.png',
+    image: 'https://clawmore.getaiready.dev/blog-assets/blog-hero.png',
   },
   {
     slug: 'the-reflector-self-critique',
@@ -227,7 +226,7 @@ const BLOG_POSTS = [
     slug: 'ironclad-autonomy-safety-vpc',
     title: 'Ironclad Autonomy: Safety & VPCs',
     excerpt:
-      '"What if it deletes my production database?" Explaining our multi-layered approach to recursion guards and context isolation.',
+      '"What if it deletes my production database?" Explaining our multi-layered approach to security guards and context isolation.',
     date: 'Mar 18, 2026',
     readTime: '9 min read',
     hash: 'safety',

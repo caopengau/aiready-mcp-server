@@ -78,7 +78,7 @@ export default function BlogPost() {
       name: 'Architect of Evolution',
     },
     image:
-      'https://clawmore.getaiready.dev/blog-assets/cdk-monorepo-mastery.png',
+      'https://clawmore.getaiready.dev/blog-assets/openclaw-chronicles-09-eaas.png',
     url: 'https://clawmore.getaiready.dev/blog/openclaw-chronicles-09-eaas',
   };
 
@@ -120,7 +120,7 @@ export default function BlogPost() {
 
             <div className="mt-12 relative aspect-[21/9] w-full overflow-hidden border border-white/10 rounded-sm group">
               <img
-                src="/blog-assets/cdk-monorepo-mastery.png"
+                src="/blog-assets/openclaw-chronicles-09-eaas.png"
                 alt="Managed Evolution Hub-and-Spoke"
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
               />

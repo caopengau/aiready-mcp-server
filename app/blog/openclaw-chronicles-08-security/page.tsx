@@ -78,7 +78,7 @@ export default function BlogPost() {
       name: 'Architect of Evolution',
     },
     image:
-      'https://clawmore.getaiready.dev/blog-assets/ironclad-autonomy-safety-vpc.png',
+      'https://clawmore.getaiready.dev/blog-assets/openclaw-chronicles-08-security.png',
     url: 'https://clawmore.getaiready.dev/blog/openclaw-chronicles-08-security',
   };
 
@@ -119,7 +119,7 @@ export default function BlogPost() {
 
             <div className="mt-12 relative aspect-[21/9] w-full overflow-hidden border border-white/10 rounded-sm group">
               <img
-                src="/blog-assets/ironclad-autonomy-safety-vpc.png"
+                src="/blog-assets/openclaw-chronicles-08-security.png"
                 alt="Security & VPC Isolation"
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
               />

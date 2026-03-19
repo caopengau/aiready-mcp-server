@@ -77,7 +77,7 @@ export default function BlogPost() {
       name: 'Architect of Evolution',
     },
     image:
-      'https://clawmore.getaiready.dev/blog-assets/surviving-void-ephemeral-persistence.png',
+      'https://clawmore.getaiready.dev/blog-assets/openclaw-chronicles-07-persistence.png',
     url: 'https://clawmore.getaiready.dev/blog/openclaw-chronicles-07-persistence',
   };
 
@@ -119,7 +119,7 @@ export default function BlogPost() {
 
             <div className="mt-12 relative aspect-[21/9] w-full overflow-hidden border border-white/10 rounded-sm group">
               <img
-                src="/blog-assets/surviving-void-ephemeral-persistence.png"
+                src="/blog-assets/openclaw-chronicles-07-persistence.png"
                 alt="Cloud-Scale Persistence"
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
               />
