@@ -27,15 +27,17 @@ export const handler = async (event: any) => {
     const customerId = userRes.Item?.stripeCustomerId;
 
     // 2. Create the $29/mo Subscription Session with off-session authorization
-    const session = await createPlatformSubscriptionSession(
+    const session = await createPlatformSubscriptionSession({
       customerId,
       userEmail,
-      !!coEvolutionOptIn,
-      successUrl ||
+      coEvolutionOptIn: !!coEvolutionOptIn,
+      successUrl:
+        successUrl ||
         `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
-      cancelUrl ||
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=cancelled`
-    );
+      cancelUrl:
+        cancelUrl ||
+        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=cancelled`,
+    });
 
     return {
       statusCode: 200,

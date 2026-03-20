@@ -8,13 +8,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
  * Creates a Stripe Checkout Session for the $29.00/mo Platform Subscription.
  * This also authorizes the 'off_session' auto-recharges for AI tokens.
  */
+export interface PlatformSubscriptionOpts {
+  customerId?: string;
+  userEmail: string;
+  coEvolutionOptIn?: boolean;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+/**
+ * Creates a Stripe Checkout Session for the $29.00/mo Platform Subscription.
+ * Accepts an options object to avoid positional boolean traps.
+ */
 export async function createPlatformSubscriptionSession(
-  customerId: string,
-  userEmail: string,
-  coEvolutionOptIn: boolean,
-  successUrl: string,
-  cancelUrl: string
+  opts: PlatformSubscriptionOpts
 ) {
+  const {
+    customerId,
+    userEmail,
+    coEvolutionOptIn = false,
+    successUrl,
+    cancelUrl,
+  } = opts;
+
   return await stripe.checkout.sessions.create({
     customer: customerId,
     customer_email: customerId ? undefined : userEmail,
