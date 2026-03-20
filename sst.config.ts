@@ -149,6 +149,12 @@ export default $config({
         OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || '',
         CLAW_MORE_BUS: bus.name,
       },
+      permissions: [
+        {
+          actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+          resources: ['*'],
+        },
+      ],
       link: [api, leads, table, aiQueue, bus],
     });
 
