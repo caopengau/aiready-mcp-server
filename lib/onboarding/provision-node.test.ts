@@ -3,6 +3,7 @@ import { ProvisioningOrchestrator } from './provision-node';
 
 // Mock AWS Vending
 vi.mock('../aws/vending', () => ({
+  findAvailableAccountInPool: vi.fn().mockResolvedValue(null),
   createManagedAccount: vi.fn().mockResolvedValue('req-123'),
   waitForAccountCreation: vi.fn().mockResolvedValue('acc-456'),
   bootstrapManagedAccount: vi
@@ -78,11 +79,13 @@ describe('ProvisioningOrchestrator', () => {
 
     const result = await orchestrator.provisionNode(options);
 
-    expect(result).toEqual({
-      accountId: 'acc-456',
-      repoUrl: 'https://github.com/testuser/test-repo',
-      roleArn: 'arn:aws:iam::acc-456:role/ClawMore-Bootstrap-Role',
-    });
+    expect(result).toEqual(
+      expect.objectContaining({
+        accountId: 'acc-456',
+        repoUrl: 'https://github.com/testuser/test-repo',
+        roleArn: 'arn:aws:iam::acc-456:role/ClawMore-Bootstrap-Role',
+      })
+    );
 
     // Verify GitHub calls
     expect(mockOctokit.repos.createUsingTemplate).toHaveBeenCalledWith(

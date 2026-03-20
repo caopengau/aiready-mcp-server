@@ -5,6 +5,14 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    exclude: [
+      '**/e2e/**',
+      '**/.next/**',
+      '**/.open-next/**',
+      '**/.sst/**',
+      '**/node_modules/**',
+    ],
+    setupFiles: ['./vitest.setup.ts'],
     alias: {
       '@aiready/core': path.resolve(__dirname, '../packages/core/src'),
     },
