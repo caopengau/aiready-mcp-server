@@ -1,43 +1,51 @@
 {
   "version": "1.0.0",
-  "description": "Definition of file ownership between Hub (Mother) and Spoke (Client) repositories.",
   "rules": [
     {
-      "pattern": "core/**",
+      "pattern": "infrastructure/core/**/*",
       "owner": "hub",
-      "description": "Core business logic and domain entities are managed by the Hub."
+      "description": "Base SST/CDK constructs and agentic architecture"
     },
     {
-      "pattern": "infra/**",
+      "pattern": "packages/agents/core/**/*",
       "owner": "hub",
-      "description": "Base infrastructure (CDK/SST constructs) is Hub-owned for security and consistency."
-    },
-    {
-      "pattern": "dashboard/**",
-      "owner": "merge",
-      "description": "The admin dashboard is Hub-owned, but spokes can add client-specific charts/widgets."
-    },
-    {
-      "pattern": "package.json",
-      "owner": "merge",
-      "description": "Dependencies must be merged; Hub pushes updates but Spoke can add new packages."
+      "description": "Canonical agent logic and reflection patterns"
     },
     {
       "pattern": "sst.config.ts",
-      "owner": "merge",
-      "description": "Infrastructure definitions are shared; Spokes can extend the stacks."
-    },
-    {
-      "pattern": "README.md",
-      "owner": "spoke",
-      "description": "Client documentation is customized by the spoke."
-    },
-    {
-      "pattern": "scripts/**",
       "owner": "hub",
-      "description": "Utility scripts and lifecycle tools are Hub-owned."
+      "strategy": "merge",
+      "description": "Main infrastructure definition (merged with client links)"
+    },
+    {
+      "pattern": "package.json",
+      "owner": "hub",
+      "strategy": "merge",
+      "description": "Dependency management"
+    },
+    {
+      "pattern": "config/**/*",
+      "owner": "spoke",
+      "description": "Client-specific business parameters"
+    },
+    {
+      "pattern": "app/business-logic/**/*",
+      "owner": "spoke",
+      "description": "The client's unique value proposition"
     }
   ],
-  "defaultOwner": "hub",
-  "conflictStrategy": "hub-priority"
+  "harvester": {
+    "allow_patterns": [
+      "abstract-patterns",
+      "optimization-logic",
+      "security-hardening"
+    ],
+    "deny_patterns": [
+      "secrets",
+      "api-keys",
+      "pii",
+      "branding",
+      "custom-prompts"
+    ]
+  }
 }

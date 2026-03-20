@@ -76,6 +76,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          scope: 'read:user user:email repo workflow',
+        },
+      },
     }),
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -115,6 +120,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
+    async session({ session, token }: { session: any; token: any }) {
+      session.accessToken = token.accessToken;
+      return session;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isAdminEmail = auth?.user?.email === 'caopengau@gmail.com';

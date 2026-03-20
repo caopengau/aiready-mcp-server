@@ -2,6 +2,9 @@ import {
   OrganizationsClient,
   CreateAccountCommand,
   DescribeCreateAccountStatusCommand,
+  ListAccountsCommand,
+  ListTagsForResourceCommand,
+  TagResourceCommand,
 } from '@aws-sdk/client-organizations';
 import {
   STSClient,
@@ -77,6 +80,58 @@ export async function waitForAccountCreation(
   }
 
   throw new Error('Timeout waiting for account creation');
+}
+
+/**
+ * Scans the AWS Organization for accounts tagged with Status: Available.
+ */
+export async function findAvailableAccountInPool(): Promise<string | null> {
+  const listCommand = new ListAccountsCommand({});
+  const response = await orgClient.send(listCommand);
+
+  if (!response.Accounts) return null;
+
+  for (const account of response.Accounts) {
+    if (account.Status !== 'ACTIVE') continue;
+
+    try {
+      const tagsCommand = new ListTagsForResourceCommand({
+        ResourceId: account.Id!,
+      });
+      const tagsResponse = await orgClient.send(tagsCommand);
+
+      const statusTag = tagsResponse.Tags?.find((t) => t.Key === 'Status');
+      if (statusTag?.Value === 'Available') {
+        return account.Id!;
+      }
+    } catch (e) {
+      // Skip accounts where we can't read tags (e.g. Master account)
+      continue;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Re-tags an account from the pool to a specific owner and project.
+ */
+export async function assignAccountToOwner(
+  accountId: string,
+  email: string,
+  repo: string
+) {
+  const tagCommand = new TagResourceCommand({
+    ResourceId: accountId,
+    Tags: [
+      { Key: 'Status', Value: 'Active' },
+      { Key: 'Owner', Value: email },
+      { Key: 'Project', Value: repo },
+      { Key: 'VendedAt', Value: new Date().toISOString() },
+    ],
+  });
+
+  await orgClient.send(tagCommand);
 }
 
 /**

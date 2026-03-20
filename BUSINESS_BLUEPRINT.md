@@ -26,19 +26,24 @@ We don't just sell software; we manage the **lifecycle** of the client's stack.
 
 Our revenue is directly tied to the efficiency and evolution of the client's stack.
 
-| Revenue Stream        | Pricing        | Logic                                                             |
-| :-------------------- | :------------- | :---------------------------------------------------------------- |
-| **Platform Fee**      | $15.00/mo      | Covers managed infrastructure + $15.00 compute credit.            |
-| **Evolution Service** | **FREE**       | Included for **Co-evolution Partners** (Opt-in).                  |
-| **One-Way Fee**       | $1.00/mutation | Charged for **Private Evolution** (Opt-out/Isolated Mode).        |
-| **Compute Overage**   | Cost + 20%     | Auto-synced from AWS Cost Explorer to Stripe (`cost-sync.ts`).    |
-| **AI Fuel Packs**     | $10.00 refill  | Pre-paid tokens for high-tier LLM reasoning (GPT-5.4 / Claude 5). |
+| Revenue Stream        | Pricing        | Logic                                                         |
+| :-------------------- | :------------- | :------------------------------------------------------------ |
+| **Platform Fee**      | $29.00/mo      | Managed infra + $29.00 compute/token credit buffer.           |
+| **Evolution Service** | **FREE**       | Included for **Co-evolution Partners** (Opt-in to Sync Back). |
+| **Private Mutation**  | $1.00/mutation | Deducted from credit for **Isolated Mode** (Opt-out).         |
+| **Compute Overage**   | Cost + 20%     | Auto-billed after credit buffer is exhausted.                 |
 
 ---
 
 ## 🛡️ 3. Governance & The Moat (Security)
 
-We maintain control through **Tiered Infrastructure Governance**.
+### **The "ClawMost" Perimeter**
+
+All client Spoke repositories are hosted as **Private Repos** within the `clawmost` GitHub Organization. This ensures:
+
+1.  **Unified Harvesting**: The Management Plane has "Org-level" read access for evolution extraction.
+2.  **IP Protection**: Clients own their logic, but the "Managed Node" infrastructure remains under our governance.
+3.  **One-Click Revocation**: If the subscription ($29/mo) fails, we can programmatically archive the repo and suspend the AWS bootstrap role.
 
 ### **The "Shadow" Bus**: `MutationPerformed` events are emitted by our platform agents to a cross-account EventBridge bus. Clients cannot "code out" the tax.
 

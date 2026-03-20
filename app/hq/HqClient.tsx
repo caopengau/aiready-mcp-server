@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '../../components/Navbar';
 import {
   Shield,
@@ -12,6 +12,7 @@ import {
   Globe,
   ArrowUpRight,
   Database,
+  Loader2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -26,11 +27,62 @@ interface HqProps {
 }
 
 export default function HqClient({ stats }: HqProps) {
+  const [isVending, setIsVending] = useState(false);
+  const [vendingStatus, setVendingStatus] = useState<string | null>(null);
+
+  const handleVendNode = async () => {
+    setIsVending(true);
+    setVendingStatus('Initiating Provisioning Loop...');
+
+    try {
+      const response = await fetch('/api/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: 'caopengau+testclient@gmail.com',
+          userName: 'Test Client Corp',
+          repoName: `serverlessclaw-instance-${Date.now().toString(36)}`,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setVendingStatus(
+          `SUCCESS: Node vended! Account: ${result.data.accountId}`
+        );
+      } else {
+        setVendingStatus(`ERROR: ${result.error}`);
+      }
+    } catch (error: any) {
+      setVendingStatus(`CRITICAL_FAILURE: ${error.message}`);
+    } finally {
+      setIsVending(false);
+      setTimeout(() => setVendingStatus(null), 10000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white selection:bg-cyber-blue/30 selection:text-cyber-blue font-sans pb-20">
       <Navbar />
 
       <main className="container mx-auto px-4 py-12">
+        {/* Status Toast - Fixed to top right */}
+        {vendingStatus && (
+          <div className="fixed top-24 right-8 z-50 bg-zinc-900 border border-cyber-blue/40 p-4 rounded-2xl shadow-[0_0_30px_rgba(0,224,255,0.2)] max-w-sm animate-in fade-in slide-in-from-right-4">
+            <div className="flex items-center gap-3">
+              {isVending ? (
+                <Loader2 className="w-4 h-4 text-cyber-blue animate-spin" />
+              ) : (
+                <Zap className="w-4 h-4 text-amber-500" />
+              )}
+              <p className="text-[10px] font-mono uppercase tracking-tighter">
+                {vendingStatus}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="space-y-2">
@@ -273,10 +325,18 @@ export default function HqClient({ stats }: HqProps) {
                 Platform Actions
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                <button className="p-4 bg-zinc-800 hover:bg-cyber-blue/10 border border-zinc-700 hover:border-cyber-blue/30 rounded-2xl flex flex-col items-center gap-2 transition-all group">
-                  <Users className="w-5 h-5 text-zinc-500 group-hover:text-cyber-blue" />
+                <button
+                  onClick={handleVendNode}
+                  disabled={isVending}
+                  className="p-4 bg-zinc-800 hover:bg-cyber-blue/10 border border-zinc-700 hover:border-cyber-blue/30 rounded-2xl flex flex-col items-center gap-2 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isVending ? (
+                    <Loader2 className="w-5 h-5 text-cyber-blue animate-spin" />
+                  ) : (
+                    <Users className="w-5 h-5 text-zinc-500 group-hover:text-cyber-blue" />
+                  )}
                   <span className="text-[10px] font-bold uppercase tracking-tighter text-zinc-400 group-hover:text-white">
-                    Vend Node
+                    {isVending ? 'Vending...' : 'Vend Node'}
                   </span>
                 </button>
                 <button className="p-4 bg-zinc-800 hover:bg-emerald-500/10 border border-zinc-700 hover:border-emerald-500/30 rounded-2xl flex flex-col items-center gap-2 transition-all group">
