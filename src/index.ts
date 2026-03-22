@@ -4,14 +4,34 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { ToolRegistry } from '@aiready/core';
+import { ToolRegistry, ToolName } from '@aiready/core';
 
-// Pre-load essential tools (following CLI pattern)
-// In a real implementation, we would want to dynamically load these
-// or have them as peer dependencies.
-import '@aiready/pattern-detect';
-import '@aiready/context-analyzer';
-import '@aiready/consistency';
+/**
+ * Mapping between tool names and @aiready/ package names.
+ * Used for dynamic registration on-demand to minimize initial context budget.
+ */
+const TOOL_PACKAGE_MAP: Record<string, string> = {
+  [ToolName.PatternDetect]: '@aiready/pattern-detect',
+  [ToolName.ContextAnalyzer]: '@aiready/context-analyzer',
+  [ToolName.NamingConsistency]: '@aiready/consistency',
+  [ToolName.AiSignalClarity]: '@aiready/ai-signal-clarity',
+  [ToolName.AgentGrounding]: '@aiready/agent-grounding',
+  [ToolName.TestabilityIndex]: '@aiready/testability',
+  [ToolName.DocDrift]: '@aiready/doc-drift',
+  [ToolName.DependencyHealth]: '@aiready/deps',
+  [ToolName.ChangeAmplification]: '@aiready/change-amplification',
+  // Aliases
+  patterns: '@aiready/pattern-detect',
+  duplicates: '@aiready/pattern-detect',
+  context: '@aiready/context-analyzer',
+  fragmentation: '@aiready/context-analyzer',
+  consistency: '@aiready/consistency',
+  'ai-signal': '@aiready/ai-signal-clarity',
+  grounding: '@aiready/agent-grounding',
+  testability: '@aiready/testability',
+  'deps-health': '@aiready/deps',
+  'change-amp': '@aiready/change-amplification',
+};
 
 /**
  * AIReady MCP Server Implementation
@@ -42,12 +62,24 @@ export class AIReadyMcpServer {
   private setupHandlers() {
     // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      const providers = ToolRegistry.getAll();
+      // Define canonical tool names to advertise to the client
+      // These will be dynamically loaded on demand
+      const toolsToAdvertise = [
+        ToolName.PatternDetect,
+        ToolName.ContextAnalyzer,
+        ToolName.NamingConsistency,
+        ToolName.AiSignalClarity,
+        ToolName.AgentGrounding,
+        ToolName.TestabilityIndex,
+        ToolName.DocDrift,
+        ToolName.DependencyHealth,
+        ToolName.ChangeAmplification,
+      ];
 
       return {
-        tools: providers.map((p) => ({
-          name: p.id,
-          description: `AIReady analysis tool: ${p.id}`,
+        tools: toolsToAdvertise.map((id) => ({
+          name: id,
+          description: `AIReady analysis tool: ${id}`,
           inputSchema: {
             type: 'object',
             properties: {
@@ -68,9 +100,34 @@ export class AIReadyMcpServer {
       const { name, arguments: args } = request.params;
 
       try {
-        const provider = ToolRegistry.find(name);
+        let provider = ToolRegistry.find(name);
+
+        // Dynamic loading if not already registered (CLI pattern)
         if (!provider) {
-          throw new Error(`Tool ${name} not found`);
+          const packageName =
+            TOOL_PACKAGE_MAP[name] ??
+            (name.startsWith('@aiready/') ? name : `@aiready/${name}`);
+
+          try {
+            console.error(
+              `[MCP] Dynamically loading ${packageName} for tool ${name}`
+            );
+            await import(packageName);
+            provider = ToolRegistry.find(name);
+          } catch (importError: any) {
+            console.error(
+              `[MCP] Failed to load tool package ${packageName}: ${importError.message}`
+            );
+            const error = new Error(
+              `Tool ${name} not found and failed to load package ${packageName}: ${importError.message}`
+            );
+            (error as any).cause = importError;
+            throw error;
+          }
+        }
+
+        if (!provider) {
+          throw new Error(`Tool ${name} not found after attempting to load`);
         }
 
         if (!args || typeof args.path !== 'string') {
