@@ -36,7 +36,6 @@ export function useImperativeHandleMethods({
   height,
   layout,
   handleLayoutChange,
-  setForcesEnabled: _setForcesEnabled,
   svgRef,
   gRef,
   setTransform,

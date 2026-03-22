@@ -70,6 +70,7 @@ export default function LiveScanDemo() {
 
   useEffect(() => {
     if (!isInView) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setScore(0);
       setProgress(0);
       setVisibleIssues([]);

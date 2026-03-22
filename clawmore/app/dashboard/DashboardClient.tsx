@@ -257,10 +257,7 @@ export default function DashboardClient({
                         </p>
                         <p className="text-[8px] text-zinc-700 font-mono tracking-tighter mt-1 group-hover:text-zinc-500 transition-colors">
                           ID: CLAW_
-                          {Math.random()
-                            .toString(36)
-                            .substring(7)
-                            .toUpperCase()}
+                          {((i + 1) * 1234).toString(36).toUpperCase()}
                         </p>
                       </div>
                     </div>

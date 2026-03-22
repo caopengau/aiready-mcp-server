@@ -1,10 +1,6 @@
 import * as vscode from 'vscode';
 import { SMART_DEFAULTS } from './utils/config';
-import {
-  AIReadyIssuesProvider,
-  GroupBy,
-  SeverityFilter,
-} from './providers/issuesProvider';
+import { AIReadyIssuesProvider } from './providers/issuesProvider';
 import { AIReadySummaryProvider } from './providers/summaryProvider';
 import {
   AIReadyReportsProvider,
@@ -154,8 +150,6 @@ export function activate(context: vscode.ExtensionContext) {
     summaryProvider.refresh();
 
     // Load existing reports on startup
-    const getWorkspacePath = () =>
-      vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     reportsProvider.refresh();
 
     // Refresh when workspace folders change

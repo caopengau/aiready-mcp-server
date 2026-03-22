@@ -6,7 +6,7 @@ vi.mock('@aiready/core', () => ({
   getParser: vi.fn((filename: string) => {
     if (filename.endsWith('.py')) {
       return {
-        parse: vi.fn((code: string, file: string) => ({
+        parse: vi.fn(() => ({
           imports: [
             { source: 'os', specifiers: ['path'], isRelative: false },
             { source: '.utils', specifiers: ['helper'], isRelative: true },

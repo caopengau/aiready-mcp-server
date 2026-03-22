@@ -116,10 +116,10 @@ export function createScanCommands(
     }
 
     const filePath = editor.document.uri.fsPath;
-    await runAIReady(filePath, true);
+    await runAIReady(filePath);
   }
 
-  async function runAIReady(path: string, quickScan = false): Promise<void> {
+  async function runAIReady(path: string): Promise<void> {
     const mergedConfig = getMergedConfig();
     const { threshold, tools } = mergedConfig;
     const workspacePath =

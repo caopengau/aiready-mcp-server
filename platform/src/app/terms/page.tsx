@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | AIReady',
@@ -140,19 +141,19 @@ export default function TermsPage() {
         </div>
 
         <div className="mt-8 flex gap-4">
-          <a
+          <Link
             href="/"
             className="text-cyan-400 hover:text-cyan-300 transition-colors"
           >
             ← Back to Home
-          </a>
+          </Link>
           <span className="text-slate-600">|</span>
-          <a
+          <Link
             href="/privacy"
             className="text-cyan-400 hover:text-cyan-300 transition-colors"
           >
             Privacy Policy →
-          </a>
+          </Link>
         </div>
       </div>
     </main>

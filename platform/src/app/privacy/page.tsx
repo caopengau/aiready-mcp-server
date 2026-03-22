@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | AIReady',
@@ -174,19 +175,19 @@ export default function PrivacyPage() {
         </div>
 
         <div className="mt-8 flex gap-4">
-          <a
+          <Link
             href="/"
             className="text-cyan-400 hover:text-cyan-300 transition-colors"
           >
             ← Back to Home
-          </a>
+          </Link>
           <span className="text-slate-600">|</span>
-          <a
+          <Link
             href="/terms"
             className="text-cyan-400 hover:text-cyan-300 transition-colors"
           >
             Terms of Service →
-          </a>
+          </Link>
         </div>
       </div>
     </main>

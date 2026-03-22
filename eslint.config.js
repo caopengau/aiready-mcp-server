@@ -23,8 +23,10 @@ export default tseslint.config(
       '**/dist/**',
       '**/node_modules/**',
       '**/build/**',
-      '.sst/**',
-      '.next/**',
+      '**/.sst/**',
+      '**/.next/**',
+      '**/.open-next/**',
+      '**/out/**',
     ],
   }
 );

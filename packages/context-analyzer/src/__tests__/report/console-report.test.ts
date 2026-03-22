@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { displayConsoleReport } from '../../report/console-report';
-import { generateSummary } from '../../summary';
 import type { ContextSummary, ContextAnalysisResult } from '../../types';
 
 // Mock chalk to avoid ANSI codes in tests

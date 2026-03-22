@@ -94,12 +94,12 @@ export async function createServerlessSCP(): Promise<string> {
 
   try {
     const response = await orgClient.send(command);
-    return response.Policy?.PolicySummary?.Id!;
+    return response.Policy?.PolicySummary?.Id ?? '';
   } catch (error: any) {
     if (error.name === 'DuplicatePolicyException') {
       // Re-fetch if we raced
       const reList = await orgClient.send(listCommand);
-      return reList.Policies?.find((p) => p.Name === policyName)?.Id!;
+      return reList.Policies?.find((p) => p.Name === policyName)?.Id ?? '';
     }
     console.error('Error creating SCP:', error);
     throw error;

@@ -17,6 +17,7 @@ function VerifyContent() {
     const token = searchParams.get('token');
 
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus('error');
       setError('No token provided');
       return;

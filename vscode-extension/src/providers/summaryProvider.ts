@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getScoreColor, createBarChart } from '../utils/visual';
+import { createBarChart } from '../utils/visual';
 
 export interface Summary {
   score: number;
@@ -127,7 +127,6 @@ export class AIReadySummaryProvider implements vscode.TreeDataProvider<vscode.Tr
       } as vscode.TreeItem);
 
       // Issue counts with visual indicators
-      const totalIssues = this.summary.issues + this.summary.warnings;
       items.push({
         label: `🔴 Critical: ${this.summary.issueBreakdown?.critical || 0}`,
         iconPath: new vscode.ThemeIcon('error'),

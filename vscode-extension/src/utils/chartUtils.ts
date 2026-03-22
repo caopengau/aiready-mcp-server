@@ -85,8 +85,7 @@ export function generateIssueBreakdownChart(
  */
 export function generateToolScoresChart(
   tools: Array<{ name: string; score: number; rating: string }>,
-  width: number = 300,
-  height: number = 150
+  width: number = 300
 ): string {
   if (tools.length === 0) {
     return `<svg width="${width}" height="50" viewBox="0 0 ${width} 50" xmlns="http://www.w3.org/2000/svg">
