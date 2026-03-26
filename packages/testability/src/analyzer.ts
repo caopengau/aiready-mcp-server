@@ -6,6 +6,7 @@ import {
   runBatchAnalysis,
   getParser,
   isTestFile,
+  isIgnorableSourceFile,
   detectTestFramework,
 } from '@aiready/core';
 import { readFileSync } from 'fs';
@@ -104,7 +105,7 @@ export async function analyzeTestability(
   });
 
   const sourceFiles = allFiles.filter(
-    (f) => !isTestFile(f, options.testPatterns)
+    (f) => !isTestFile(f, options.testPatterns) && !isIgnorableSourceFile(f)
   );
   const testFiles = allFiles.filter((f) => isTestFile(f, options.testPatterns));
 

@@ -98,8 +98,39 @@ function isProcessEnvAccess(node: any): boolean {
   );
 }
 
-function isSwallowedCatch(body: any[]): boolean {
+function isSstResourceAccess(node: any): boolean {
+  if (!node) return false;
+  let current = node;
+  // Handle ChainExpression for optional chaining like Resource.MySecret?.value
+  if (current.type === 'ChainExpression') {
+    current = current.expression;
+  }
+
+  // Recursively check for 'Resource' identifier at the base of the member chain
+  while (current && current.type === 'MemberExpression') {
+    if (
+      current.object?.type === 'Identifier' &&
+      current.object.name === 'Resource'
+    ) {
+      return true;
+    }
+    current = current.object;
+  }
+
+  // Also check if the node itself is 'Resource' (rare but possible in some contexts)
+  if (current?.type === 'Identifier' && current.name === 'Resource') {
+    return true;
+  }
+
+  return false;
+}
+
+function isSwallowedCatch(body: any[], filePath: string): boolean {
   if (body.length === 0) return true;
+
+  // UI components often have intentional silent catches for telemetry/analytics
+  const isUiComponent = filePath.endsWith('.tsx') || filePath.endsWith('.jsx');
+
   if (body.length === 1) {
     const stmt = body[0];
     if (
@@ -107,10 +138,20 @@ function isSwallowedCatch(body: any[]): boolean {
       stmt.expression?.type === 'CallExpression'
     ) {
       const callee = stmt.expression.callee;
+      // console.log/warn/error is still considered "swallowed" but might be acceptable
       if (callee?.object?.name === 'console') return true;
+
+      // If it's a UI component and looks like telemetry, it's a false positive
+      if (isUiComponent) {
+        const calleeName = callee?.name || callee?.property?.name || '';
+        if (/telemetry|analytics|track|logEvent/i.test(calleeName)) {
+          return false; // Not "swallowed" in a bad way
+        }
+      }
     }
     if (stmt.type === 'ThrowStatement') return false;
   }
+
   return false;
 }
 
@@ -160,18 +201,24 @@ export function detectDefensivePatterns(
       node.type === 'TSAsExpression' &&
       node.typeAnnotation?.type === 'TSAnyKeyword'
     ) {
-      counts['as-any']++;
-      issues.push(
-        makeIssue(
-          'as-any',
-          Severity.Major,
-          '`as any` type assertion bypasses type safety',
-          filePath,
-          node.loc?.start.line ?? 0,
-          node.loc?.start.column ?? 0,
-          getLineContent(code, node.loc?.start.line ?? 0)
-        )
-      );
+      // Ignore if it's acting on an SST resource or process.env, common "necessary escape hatches"
+      if (
+        !isSstResourceAccess(node.expression) &&
+        !isProcessEnvAccess(node.expression)
+      ) {
+        counts['as-any']++;
+        issues.push(
+          makeIssue(
+            'as-any',
+            Severity.Major,
+            '`as any` type assertion bypasses type safety',
+            filePath,
+            node.loc?.start.line ?? 0,
+            node.loc?.start.column ?? 0,
+            getLineContent(code, node.loc?.start.line ?? 0)
+          )
+        );
+      }
     }
 
     // Pattern: as unknown
@@ -179,18 +226,24 @@ export function detectDefensivePatterns(
       node.type === 'TSAsExpression' &&
       node.typeAnnotation?.type === 'TSUnknownKeyword'
     ) {
-      counts['as-unknown']++;
-      issues.push(
-        makeIssue(
-          'as-unknown',
-          Severity.Major,
-          '`as unknown` double-cast bypasses type safety',
-          filePath,
-          node.loc?.start.line ?? 0,
-          node.loc?.start.column ?? 0,
-          getLineContent(code, node.loc?.start.line ?? 0)
-        )
-      );
+      // Ignore if it's acting on an SST resource or process.env
+      if (
+        !isSstResourceAccess(node.expression) &&
+        !isProcessEnvAccess(node.expression)
+      ) {
+        counts['as-unknown']++;
+        issues.push(
+          makeIssue(
+            'as-unknown',
+            Severity.Major,
+            '`as unknown` double-cast bypasses type safety',
+            filePath,
+            node.loc?.start.line ?? 0,
+            node.loc?.start.column ?? 0,
+            getLineContent(code, node.loc?.start.line ?? 0)
+          )
+        );
+      }
     }
 
     // Pattern: deep optional chaining
@@ -218,24 +271,27 @@ export function detectDefensivePatterns(
       node.operator === '??' &&
       isLiteral(node.right)
     ) {
-      counts['nullish-literal-default']++;
-      issues.push(
-        makeIssue(
-          'nullish-literal-default',
-          Severity.Minor,
-          'Nullish coalescing with literal default suggests missing upstream type guarantee',
-          filePath,
-          node.loc?.start.line ?? 0,
-          node.loc?.start.column ?? 0,
-          getLineContent(code, node.loc?.start.line ?? 0)
-        )
-      );
+      // Ignore if it's an SST Resource or process.env - the standard way to handle fallbacks
+      if (!isSstResourceAccess(node.left) && !isProcessEnvAccess(node.left)) {
+        counts['nullish-literal-default']++;
+        issues.push(
+          makeIssue(
+            'nullish-literal-default',
+            Severity.Minor,
+            'Nullish coalescing with literal default suggests missing upstream type guarantee',
+            filePath,
+            node.loc?.start.line ?? 0,
+            node.loc?.start.column ?? 0,
+            getLineContent(code, node.loc?.start.line ?? 0)
+          )
+        );
+      }
     }
 
     // Pattern: swallowed error
     if (node.type === 'TryStatement' && node.handler) {
       const catchBody = node.handler.body?.body;
-      if (catchBody && isSwallowedCatch(catchBody)) {
+      if (catchBody && isSwallowedCatch(catchBody, filePath)) {
         counts['swallowed-error']++;
         issues.push(
           makeIssue(
