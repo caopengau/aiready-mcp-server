@@ -1,7 +1,7 @@
 {
   "name": "@aiready/mcp-server",
   "version": "0.2.3",
-  "description": "AIReady Model Context Protocol (MCP) Server",
+  "description": "The AIReady Model Context Protocol (MCP) Server for Agentic Readiness. Optimize codebases for AI agents like Cursor, Windsurf, and Claude directly via MCP.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
@@ -37,8 +37,16 @@
     "aiready",
     "mcp",
     "model-context-protocol",
+    "Agentic Readiness",
+    "Cursor",
+    "Windsurf",
+    "Claude",
+    "Copilot",
     "ai-readiness",
-    "code-analysis"
+    "code-analysis",
+    "semantic-duplicates",
+    "context-window",
+    "token-optimization"
   ],
   "license": "MIT"
 }
