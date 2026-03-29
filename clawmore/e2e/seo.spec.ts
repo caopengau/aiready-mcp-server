@@ -56,8 +56,7 @@ test.describe('ClawMore SEO Metadata', () => {
     expect(text).toContain('https://clawmore.ai/blog');
   });
 
-  test.skip('blog index has correct SEO tags', async ({ page }) => {
-    // /blog returns 403 in production CloudFront — skip until routing is fixed
+  test('blog index has correct SEO tags', async ({ page }) => {
     await page.goto('/blog');
     await expect(page).toHaveTitle(/Blog | ClawMore/);
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
