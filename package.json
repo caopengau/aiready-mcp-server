@@ -15,7 +15,9 @@
     "test": "vitest run",
     "lint": "eslint src",
     "clean": "rm -rf dist",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "format-check": "prettier --check . --ignore-path ../../.prettierignore"
   },
   "dependencies": {
     "@aiready/consistency": "workspace:*",

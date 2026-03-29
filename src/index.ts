@@ -108,12 +108,14 @@ export class AIReadyMcpServer {
           },
         ],
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         content: [
           {
             type: 'text',
-            text: `Failed to get remediation: ${error.message}. Please visit the dashboard to fix manually.`,
+            text: `Failed to get remediation: ${errorMessage}. Please visit the dashboard to fix manually.`,
           },
         ],
         isError: true,
@@ -188,7 +190,13 @@ export class AIReadyMcpServer {
 
       try {
         if (name === 'get_remediation_diff') {
-          return await this.handleRemediation(args as any);
+          return await this.handleRemediation(
+            args as {
+              issue_id: string;
+              file_path: string;
+              context: string;
+            }
+          );
         }
 
         let provider = ToolRegistry.find(name);
@@ -205,12 +213,16 @@ export class AIReadyMcpServer {
             );
             await import(packageName);
             provider = ToolRegistry.find(name);
-          } catch (importError: any) {
+          } catch (importError: unknown) {
+            const importErrorMessage =
+              importError instanceof Error
+                ? importError.message
+                : String(importError);
             console.error(
-              `[MCP] Failed to load tool package ${packageName}: ${importError.message}`
+              `[MCP] Failed to load tool package ${packageName}: ${importErrorMessage}`
             );
             const error = new Error(
-              `Tool ${name} not found and failed to load package ${packageName}: ${importError.message}`
+              `Tool ${name} not found and failed to load package ${packageName}: ${importErrorMessage}`
             );
             (error as { cause?: unknown }).cause = importError;
             throw error;
@@ -240,12 +252,14 @@ export class AIReadyMcpServer {
             },
           ],
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         return {
           content: [
             {
               type: 'text',
-              text: `Error: ${error.message}`,
+              text: `Error: ${errorMessage}`,
             },
           ],
           isError: true,
