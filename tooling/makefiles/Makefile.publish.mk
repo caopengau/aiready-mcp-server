@@ -389,7 +389,7 @@ publish-clawmore: ## Publish clawmore to GitHub. Usage: make publish-clawmore [O
 # Push to monorepo and all spoke repos
 sync: ## Push monorepo to origin and sync all spokes to their public repos. Use FORCE=true to sync all.
 	@$(call log_step,Pushing to monorepo...)
-	@SKIP_PRE_PUSH=true git push origin $(TARGET_BRANCH)
+	@SKIP_SYNC_CHECK=true git push origin $(TARGET_BRANCH)
 	@$(call log_success,Pushed to monorepo)
 	@$(call log_step,Detecting changes to sync...)
 	@if [ "$(FORCE)" = "true" ]; then \

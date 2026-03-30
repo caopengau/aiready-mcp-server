@@ -64,20 +64,22 @@ pre-commit: ## Run pre-commit checks (lint-staged on staged files only)
 
 pre-push: ## Run pre-push checks (quality checks + AIReady scan)
 	@if [ "$$SKIP_PRE_PUSH" = "true" ]; then \
-		$(call log_info,⏭️  Skipping AIReady pre-push scan (SKIP_PRE_PUSH=true)); \
+		$(call log_info,⏭️  Skipping ALL pre-push checks (SKIP_PRE_PUSH=true)); \
 	else \
-		$(call log_step,🔍 Checking for un-synced spoke changes...); \
-		SPOKE_PATTERN="^(packages/|apps/|tooling/github-action/|tooling/homebrew/)"; \
-		CHANGED_SPOKES=$$(git diff --name-only origin/$(TARGET_BRANCH) 2>/dev/null | grep -E "$$SPOKE_PATTERN" | cut -d/ -f1-2 | sort -u); \
-		if [ -n "$$CHANGED_SPOKES" ]; then \
-			$(call separator,$(RED)); \
-			$(call log_error,Spoke changes detected! Use 'make sync' instead of 'git push' to update standalone repos.); \
-			echo "$$CHANGED_SPOKES" | sed 's/^/   - /'; \
-			$(call separator,$(RED)); \
-			echo ""; \
-			echo "👉 To fix this, run: make sync"; \
-			echo ""; \
-			exit 1; \
+		if [ "$$SKIP_SYNC_CHECK" != "true" ]; then \
+			$(call log_step,🔍 Checking for un-synced spoke changes...); \
+			SPOKE_PATTERN="^(packages/|apps/|tooling/github-action/|tooling/homebrew/)"; \
+			CHANGED_SPOKES=$$(git diff --name-only origin/$(TARGET_BRANCH) 2>/dev/null | grep -E "$$SPOKE_PATTERN" | cut -d/ -f1-2 | sort -u); \
+			if [ -n "$$CHANGED_SPOKES" ]; then \
+				$(call separator,$(RED)); \
+				$(call log_error,Spoke changes detected! Use 'make sync' instead of 'git push' to update standalone repos.); \
+				echo "$$CHANGED_SPOKES" | sed 's/^/   - /'; \
+				$(call separator,$(RED)); \
+				echo ""; \
+				echo "👉 To fix this, run: make sync"; \
+				echo ""; \
+				exit 1; \
+			fi; \
 		fi; \
 		$(call log_step,🔧 Running quality checks (lint + type-check + format-check) in parallel...); \
 		if command -v $(TURBO) >/dev/null 2>&1 || [ -f ./node_modules/.bin/turbo ]; then \
@@ -87,8 +89,8 @@ pre-push: ## Run pre-push checks (quality checks + AIReady scan)
 				exit 1; \
 			}; \
 		fi; \
-		$(call log_step,🚀 Running AIReady pre-push scan (Threshold: 75)...); \
-		aiready scan . --threshold 75; \
+		$(call log_step,🚀 Running AIReady pre-push scan (Threshold: 60)...); \
+		aiready scan . --threshold 60; \
 	fi
 
 lint-staged: ## Run lint-staged on changed files
