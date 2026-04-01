@@ -122,6 +122,18 @@ release-spoke-%:
 	$(MAKE) publish SPOKE=$* PUBLIC_OWNER=$(PUBLIC_OWNER) || exit 1; \
 	$(call log_success,Released @aiready/$*)
 
+# Internal parallel helper for versioning
+.PHONY: version-spoke-%
+version-spoke-%:
+	@$(MAKE) version-$(TYPE) SPOKE=$*
+
+# Internal parallel helper for tagging
+.PHONY: tag-spoke-%
+tag-spoke-%:
+	@version=$$(node -p "require('$(ROOT_DIR)/packages/$*/package.json').version"); \
+	$(call log_step,Tagging @aiready/$* v$$version...); \
+	cd $(ROOT_DIR) && git tag -f -a "$*-v$$version" -m "Release @aiready/$* v$$version" || true
+
 release-checks-spoke: ## Shared checks for release-one (SPOKE required)
 	$(call require_spoke)
 	@$(call log_step,Running shared release checks for @aiready/$(SPOKE)...)
@@ -143,12 +155,14 @@ release-checks-spoke: ## Shared checks for release-one (SPOKE required)
 release-checks-all-spokes: ## Shared checks for release-all
 	@$(call log_step,Phase 1: Build...)
 	@$(MAKE) -C $(ROOT_DIR) build
-	@$(call log_step,Phase 2: Shared test suite...)
-	@$(MAKE) -C $(ROOT_DIR) test
-	@$(MAKE) -C $(ROOT_DIR) test-contract
-	@$(MAKE) -C $(ROOT_DIR) test-integration
-	@$(call run_if_enabled,$(RELEASE_ALL_PLATFORM_E2E),$(MAKE) -C $(ROOT_DIR) test-platform-e2e-local,platform local E2E)
-	@$(call run_if_enabled,$(RELEASE_ALL_DOWNSTREAM),$(MAKE) -C $(ROOT_DIR) test-downstream,downstream tests)
+	@$(call log_step,Phase 2: Parallel tests (unit + contract + integration)...)
+	@$(MAKE) $(MAKE_PARALLEL) test test-contract test-integration
+	@$(call log_step,Phase 3: E2E and Downstream tests...)
+	@if [ "$(RELEASE_ALL_PLATFORM_E2E)" = "1" ] || [ "$(RELEASE_ALL_DOWNSTREAM)" = "1" ]; then \
+		$(MAKE) $(MAKE_PARALLEL) \
+			$(if $(filter 1,$(RELEASE_ALL_PLATFORM_E2E)),test-platform-e2e-local) \
+			$(if $(filter 1,$(RELEASE_ALL_DOWNSTREAM)),test-downstream); \
+	fi
 
 release-checks-landing: ## Shared checks for landing release
 	@$(call log_step,Running landing release checks...)
@@ -334,17 +348,12 @@ release-one: ## Release one npm spoke: SPOKE=name TYPE=patch|minor|major
 release-all: ## Release all npm spokes: TYPE=patch|minor|major
 	@$(validate_type)
 	@$(call run_if_enabled,$(RELEASE_PRECHECKS),$(MAKE) -C $(ROOT_DIR) release-checks-all-spokes,all-spoke checks)
-	@$(call log_step,Phase 3: Version bump all npm spokes...)
-	@for spoke in $(NPM_PUBLISH_SPOKES); do \
-		$(MAKE) -C $(ROOT_DIR) $(call bump_target_for_type,$(TYPE)) SPOKE=$$spoke || exit 1; \
-	done
+	@$(call log_step,Phase 3: Version bump all npm spokes in parallel...)
+	@$(MAKE) $(MAKE_PARALLEL) $(addprefix version-spoke-,$(NPM_PUBLISH_SPOKES)) TYPE=$(TYPE)
 	@$(call log_step,Phase 4: Commit + tag all...)
 	@cd $(ROOT_DIR) && git add . && \
 		git commit -m "chore(release): version bumps across spokes" || true
-	@for spoke in $(NPM_PUBLISH_SPOKES); do \
-		version=$$(node -p "require('$(ROOT_DIR)/packages/$$spoke/package.json').version"); \
-		cd $(ROOT_DIR) && git tag -f -a "$$spoke-v$$version" -m "Release @aiready/$$spoke v$$version" || true; \
-	done
+	@$(MAKE) $(MAKE_PARALLEL) $(addprefix tag-spoke-,$(NPM_PUBLISH_SPOKES))
 	@$(call run_if_enabled,$(RELEASE_PUBLISH),$(call log_step,Phase 5: Publish core...) && $(MAKE) -C $(ROOT_DIR) npm-publish SPOKE=$(CORE_SPOKE) && $(MAKE) -C $(ROOT_DIR) publish SPOKE=$(CORE_SPOKE) PUBLIC_OWNER=$(PUBLIC_OWNER),publish core)
 	@$(call run_if_enabled,$(RELEASE_PUBLISH),$(call log_step,Phase 6: Publish middle spokes in parallel...) && $(MAKE) $(MAKE_PARALLEL) $(addprefix release-spoke-,$(filter-out $(CORE_SPOKE) $(CLI_SPOKE),$(NPM_PUBLISH_SPOKES))),publish middle spokes)
 	@$(call run_if_enabled,$(RELEASE_PUBLISH),$(call log_step,Phase 7: Publish CLI...) && $(MAKE) -C $(ROOT_DIR) npm-publish SPOKE=$(CLI_SPOKE) && $(MAKE) -C $(ROOT_DIR) publish SPOKE=$(CLI_SPOKE) PUBLIC_OWNER=$(PUBLIC_OWNER),publish cli)

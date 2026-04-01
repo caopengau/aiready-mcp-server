@@ -91,7 +91,7 @@ homebrew-publish: ## Instructions for publishing to Homebrew tap
 	@echo "1. Create homebrew-tap repository"
 	@echo "2. Copy formula to Formula/ directory"
 	@echo "3. Update SHA256 hash"
-	@echo "4. Users can: brew tap caopengau/tap && brew install aiready"
+	@echo "4. Users can: brew tap getaiready/tap && brew install aiready"
 
 # ============================================================================
 # Status & Overview

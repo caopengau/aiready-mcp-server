@@ -99,7 +99,7 @@ verify-aws-account:
 	printf '$(GREEN)✓ AWS Account verified: $(AWS_PROFILE) ('"$$CURRENT_ACCOUNT"') matches $(EXPECTED_AWS_ACCOUNT_ID)$(RESET_COLOR)\n'
 
 # Notifications (defaults for solo founder)
-SES_TO_EMAIL ?= caopengau@gmail.com
+SES_TO_EMAIL ?= team@getaiready.dev
 
 # Cloudflare DNS and Workers (optional; do not commit secrets)
 CLOUDFLARE_API_TOKEN ?=

@@ -111,10 +111,7 @@ test-vscode-extension: ## Compile the VS Code extension to ensure no breaking ch
 
 test-downstream: ## Run all downstream verification tests (platform, visualizer, vscode-extension)
 	@$(call log_step,Running DOWNSTREAM verification (safety check for hubs)...)
-	@$(MAKE) test-platform || exit 1
-	@$(MAKE) test-visualizer || exit 1
-	@$(MAKE) test-vscode-extension || exit 1
-	@$(MAKE) test-landing || exit 1
+	@$(MAKE) $(MAKE_PARALLEL) test-platform test-visualizer test-vscode-extension test-landing
 	@$(call log_success,All downstream services verified)
 
 test-clawmore-e2e-local: ## Run ClawMore E2E tests locally (uses next dev, not sst dev)
