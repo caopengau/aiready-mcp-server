@@ -104,7 +104,7 @@ describe('AIReady MCP Server Integration', () => {
     expect(typedResult.isError).toBe(true);
     expect(typedResult.content[0].type).toBe('text');
     expect((typedResult.content[0] as any).text).toContain(
-      'Missing required argument: path'
+      'Invalid arguments for pattern-detect'
     );
   });
 });

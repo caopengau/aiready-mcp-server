@@ -5,6 +5,20 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { ToolRegistry, ToolName } from '@aiready/core';
+import { z } from 'zod';
+
+/**
+ * Zod schemas for tool arguments
+ */
+const AnalysisArgsSchema = z.object({
+  path: z.string().describe('Path to the directory to analyze'),
+});
+
+const RemediationArgsSchema = z.object({
+  issue_id: z.string().describe('The unique ID of the issue to fix'),
+  file_path: z.string().describe('The path to the file containing the issue'),
+  context: z.string().describe('The content of the file or surrounding code'),
+});
 
 /**
  * Mapping between tool names and @aiready/ package names.
@@ -38,12 +52,13 @@ const TOOL_PACKAGE_MAP: Record<string, string> = {
  */
 export class AIReadyMcpServer {
   private server: Server;
+  private version: string = '0.2.10';
 
   constructor() {
     this.server = new Server(
       {
         name: 'aiready-server',
-        version: '0.1.0',
+        version: this.version,
       },
       {
         capabilities: {
@@ -59,11 +74,7 @@ export class AIReadyMcpServer {
     };
   }
 
-  private async handleRemediation(args: {
-    issue_id: string;
-    file_path: string;
-    context: string;
-  }) {
+  private async handleRemediation(args: z.infer<typeof RemediationArgsSchema>) {
     const apiKey = process.env.AIREADY_API_KEY;
     const serverUrl =
       process.env.AIREADY_PLATFORM_URL || 'https://platform.getaiready.dev';
@@ -140,48 +151,47 @@ export class AIReadyMcpServer {
         ToolName.ChangeAmplification,
       ];
 
-      return {
-        tools: [
-          ...toolsToAdvertise.map((id) => ({
-            name: id,
-            description: `Scan the directory for ${id} issues to improve AI-readiness.`,
-            inputSchema: {
-              type: 'object',
-              properties: {
-                path: {
-                  type: 'string',
-                  description: 'Path to the directory to analyze',
-                },
+      const tools: any[] = [
+        ...toolsToAdvertise.map((id) => ({
+          name: id,
+          description: `Scan the directory for ${id} issues to improve AI-readiness.`,
+          inputSchema: {
+            type: 'object',
+            properties: {
+              path: {
+                type: 'string',
+                description: 'Path to the directory to analyze',
               },
-              required: ['path'],
             },
-          })),
-          {
-            name: 'get_remediation_diff',
-            description:
-              'Get a precise code diff to fix a specific AI-readiness issue (Requires AIReady API Key).',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                issue_id: {
-                  type: 'string',
-                  description:
-                    'The unique ID of the issue to fix (from a scan).',
-                },
-                file_path: {
-                  type: 'string',
-                  description: 'The path to the file containing the issue.',
-                },
-                context: {
-                  type: 'string',
-                  description: 'The content of the file or surrounding code.',
-                },
-              },
-              required: ['issue_id', 'file_path', 'context'],
-            },
+            required: ['path'],
           },
-        ],
-      };
+        })),
+        {
+          name: 'get_remediation_diff',
+          description:
+            'Get a precise code diff to fix a specific AI-readiness issue (Requires AIReady API Key).',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              issue_id: {
+                type: 'string',
+                description: 'The unique ID of the issue to fix (from a scan).',
+              },
+              file_path: {
+                type: 'string',
+                description: 'The path to the file containing the issue.',
+              },
+              context: {
+                type: 'string',
+                description: 'The content of the file or surrounding code.',
+              },
+            },
+            required: ['issue_id', 'file_path', 'context'],
+          },
+        },
+      ];
+
+      return { tools };
     });
 
     // Handle tool execution
@@ -190,14 +200,22 @@ export class AIReadyMcpServer {
 
       try {
         if (name === 'get_remediation_diff') {
-          return await this.handleRemediation(
-            args as {
-              issue_id: string;
-              file_path: string;
-              context: string;
-            }
+          const parsedArgs = RemediationArgsSchema.safeParse(args);
+          if (!parsedArgs.success) {
+            throw new Error(
+              `Invalid arguments for ${name}: ${parsedArgs.error.message}`
+            );
+          }
+          return await this.handleRemediation(parsedArgs.data);
+        }
+
+        const parsedArgs = AnalysisArgsSchema.safeParse(args);
+        if (!parsedArgs.success) {
+          throw new Error(
+            `Invalid arguments for ${name}: ${parsedArgs.error.message}`
           );
         }
+        const { path: rootDir } = parsedArgs.data;
 
         let provider = ToolRegistry.find(name);
 
@@ -233,14 +251,10 @@ export class AIReadyMcpServer {
           throw new Error(`Tool ${name} not found after attempting to load`);
         }
 
-        if (!args || typeof args.path !== 'string') {
-          throw new Error('Missing required argument: path');
-        }
-
-        console.error(`[MCP] Executing ${name} on ${args.path}`);
+        console.error(`[MCP] Executing ${name} on ${rootDir}`);
 
         const results = await provider.analyze({
-          rootDir: args.path,
+          rootDir,
         });
 
         // Format results for the agent
