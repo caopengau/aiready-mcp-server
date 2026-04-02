@@ -7,6 +7,7 @@ crons = ["*/5 * * * *"]
 
 [vars]
 PROJECT_NAME = "Platform"
-URL_TO_CHECK = "https://platform.getaiready.dev"
+URL_TO_CHECK = "https://platform.getaiready.dev/api/health"
+RETRIES = "3"
 SNS_TOPIC_ARN = "arn:aws:sns:ap-southeast-2:316759592139:aiready-health-alerts"
 AWS_REGION = "ap-southeast-2"

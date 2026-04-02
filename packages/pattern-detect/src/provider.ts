@@ -56,7 +56,10 @@ export const PATTERN_DETECT_PROVIDER: ToolProvider = {
     // This means only Critical and Major issues are shown, but scoring was done on ALL duplicates
     let scoreData = duplicates;
     const patternOptions = options as PatternDetectOptions;
-    if (patternOptions.severity && patternOptions.severity !== 'all') {
+    if (
+      patternOptions.severity &&
+      (patternOptions.severity as string) !== 'all'
+    ) {
       const severityMap: Record<string, Severity> = {
         critical: Severity.Critical,
         high: Severity.Major, // 'high' maps to Major and above

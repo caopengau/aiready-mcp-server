@@ -9,8 +9,6 @@ export interface PatternDetectOptions extends ScanOptions {
   minSharedTokens?: number; // Minimum shared tokens to consider a candidate, default 8
   maxCandidatesPerBlock?: number; // Cap candidates per block, default 100
   streamResults?: boolean; // Output duplicates incrementally as found (default false)
-  severity?: string; // Filter by severity: critical|high|medium|all (default: all)
-  includeTests?: boolean; // Include test files in analysis (default: false)
   useSmartDefaults?: boolean; // Use smart defaults based on repo size (default: true)
   groupByFilePair?: boolean; // Group duplicates by file pair to reduce noise (default: true)
   createClusters?: boolean; // Create refactor clusters for related patterns (default: true)
@@ -39,7 +37,7 @@ export async function getSmartDefaults(
       minSharedTokens: 12,
       maxCandidatesPerBlock: 5,
       streamResults: false,
-      severity: 'all',
+      severity: 'all' as any,
       includeTests: false,
     };
   }
@@ -61,7 +59,7 @@ export async function getSmartDefaults(
 
   const minSimilarity = Math.min(0.75, 0.45 + (estimatedBlocks / 10000) * 0.3);
   const batchSize = estimatedBlocks > 1000 ? 200 : 100;
-  const severity = estimatedBlocks > 3000 ? 'high' : 'all';
+  const severity = (estimatedBlocks > 3000 ? 'high' : 'all') as any;
   const maxCandidatesPerBlock = Math.max(
     5,
     Math.min(100, Math.floor(1000000 / estimatedBlocks))

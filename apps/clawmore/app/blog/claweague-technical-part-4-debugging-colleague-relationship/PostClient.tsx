@@ -116,7 +116,7 @@ export default function PostClient() {
         </p>
       </section>
 
-      <section className="mt-16 p-8 bg-[#0a0a0a] border border-white/5 rounded-3xl text-center">
+      <section className="mt-16 p-8 bg-background border border-white/5 rounded-3xl text-center">
         <h3 className="text-3xl font-black italic tracking-tighter uppercase mb-6">
           Welcome to the <br />{' '}
           <span className="text-cyber-purple">Eclawnomy</span>

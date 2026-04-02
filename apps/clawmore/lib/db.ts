@@ -36,9 +36,12 @@ export interface UserMetadata {
   coEvolutionOptIn: boolean;
   autoTopupEnabled: boolean;
   enabledSkills: string[]; // List of enabled agent skills (e.g., 'refactor', 'security')
+  accountStatus?: 'ACTIVE' | 'SUSPENDED';
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
   stripeMutationSubscriptionItemId?: string;
+  suspendedAt?: string;
+  resumedAt?: string;
 }
 
 export interface MutationRecord {
@@ -117,9 +120,9 @@ export async function ensureUserMetadata(email: string) {
           'SET EntityType = :type, aiTokenBalanceCents = :balance, aiRefillThresholdCents = :threshold, aiTopupAmountCents = :topupAmount, coEvolutionOptIn = :coevo, autoTopupEnabled = :topup, enabledSkills = :skills',
         ExpressionAttributeValues: {
           ':type': 'UserMetadata',
-          ':balance': 500, // $5.00 welcome credit
-          ':threshold': 100, // $1.00 refill threshold
-          ':topupAmount': 1000, // $10.00 default top-up
+          ':balance': 5_00, // $5.00 welcome credit
+          ':threshold': 1_00, // $1.00 refill threshold
+          ':topupAmount': 10_00, // $10.00 default top-up
           ':coevo': false,
           ':topup': true,
           ':skills': ['refactor', 'validation'], // Default skills
@@ -420,7 +423,7 @@ export async function addCredits(
 
   // Check current status
   const current = await getUserMetadata(email);
-  const wasSuspended = (current as any)?.accountStatus === 'SUSPENDED';
+  const wasSuspended = current?.accountStatus === 'SUSPENDED';
 
   const result = await docClient.send(
     new UpdateCommand({

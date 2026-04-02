@@ -112,7 +112,7 @@ export default function TraceViewer() {
       </div>
 
       {/* Main Terminal View */}
-      <div className="p-6 font-mono text-[11px] min-h-[300px] max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+      <div className="p-6 font-mono text-[11px] min-h-75 max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
         <AnimatePresence>
           {logs.map((log, i) => (
             <motion.div

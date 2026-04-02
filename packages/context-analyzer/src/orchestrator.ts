@@ -166,8 +166,8 @@ export async function analyzeContext(
     ...scanOptions,
     exclude:
       includeNodeModules && scanOptions.exclude
-        ? scanOptions.exclude.filter(
-            (pattern) => pattern !== '**/node_modules/**'
+        ? (scanOptions.exclude as string[]).filter(
+            (pattern: string) => pattern !== '**/node_modules/**'
           )
         : scanOptions.exclude,
   });
