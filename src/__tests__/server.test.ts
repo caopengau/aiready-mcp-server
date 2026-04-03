@@ -127,4 +127,42 @@ describe('AIReady MCP Server Integration', () => {
       'Invalid arguments for pattern-detect'
     );
   });
+
+  it('should list available resources', async () => {
+    const result = await client.listResources();
+    expect(result.resources).toBeDefined();
+    const uris = result.resources.map((r) => r.uri);
+    expect(uris).toContain('aiready://project/summary');
+    expect(uris).toContain('aiready://project/issues');
+  });
+
+  it('should read resource content', async () => {
+    const result = await client.readResource({
+      uri: 'aiready://project/summary',
+    });
+    expect(result.contents).toBeDefined();
+    expect(result.contents[0].uri).toBe('aiready://project/summary');
+    expect(result.contents[0].text).toContain('# AIReady Summary');
+  });
+
+  it('should list available prompts', async () => {
+    const result = await client.listPrompts();
+    expect(result.prompts).toBeDefined();
+    const promptNames = result.prompts.map((p) => p.name);
+    expect(promptNames).toContain('analyze-project');
+    expect(promptNames).toContain('remediate-issue');
+  });
+
+  it('should get prompt content', async () => {
+    const result = await client.getPrompt({
+      name: 'analyze-project',
+      arguments: { path: '/test/path' },
+    });
+    expect(result.messages).toBeDefined();
+    expect(result.messages[0].role).toBe('user');
+    expect(
+      (result.messages[0].content as any).text ||
+        (result.messages[0].content as any).content[0].text
+    ).toContain('/test/path');
+  });
 });

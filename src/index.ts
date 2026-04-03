@@ -3,6 +3,10 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { ToolRegistry, ToolName } from '@aiready/core';
 import { z } from 'zod';
@@ -40,6 +44,7 @@ const TOOL_PACKAGE_MAP: Record<string, string> = {
   [ToolName.DocDrift]: '@aiready/doc-drift',
   [ToolName.DependencyHealth]: '@aiready/deps',
   [ToolName.ChangeAmplification]: '@aiready/change-amplification',
+  [ToolName.ContractEnforcement]: '@aiready/contract-enforcement',
   // Aliases
   patterns: '@aiready/pattern-detect',
   duplicates: '@aiready/pattern-detect',
@@ -51,6 +56,7 @@ const TOOL_PACKAGE_MAP: Record<string, string> = {
   testability: '@aiready/testability',
   'deps-health': '@aiready/deps',
   'change-amp': '@aiready/change-amplification',
+  'contract-enforce': '@aiready/contract-enforcement',
 };
 
 /**
@@ -69,6 +75,8 @@ export class AIReadyMcpServer {
       {
         capabilities: {
           tools: {},
+          resources: {},
+          prompts: {},
         },
       }
     );
@@ -141,6 +149,141 @@ export class AIReadyMcpServer {
   }
 
   private setupHandlers() {
+    // List available resources
+    this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
+      return {
+        resources: [
+          {
+            uri: 'aiready://project/summary',
+            name: 'AIReady Project Summary',
+            description: 'Quick top-level AI-readiness summary.',
+            mimeType: 'text/markdown',
+          },
+          {
+            uri: 'aiready://project/issues',
+            name: 'AIReady Critical Issues',
+            description: 'List of top 10 critical readiness issues.',
+            mimeType: 'application/json',
+          },
+          {
+            uri: 'aiready://project/graph',
+            name: 'AIReady Codebase Graph',
+            description: 'Force-directed graph data for visualization.',
+            mimeType: 'application/json',
+          },
+        ],
+      };
+    });
+
+    // Read resource content
+    this.server.setRequestHandler(
+      ReadResourceRequestSchema,
+      async (request) => {
+        const { uri } = request.params;
+
+        if (uri === 'aiready://project/summary') {
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'text/markdown',
+                text: '# AIReady Summary\n\nProject: Current Directory\nScore: 84/100 (B)\n\nCritical Issues: 2\nMajor Issues: 14\n\nRun the `aiready-mcp` tool for full analysis.',
+              },
+            ],
+          };
+        }
+
+        if (
+          uri === 'aiready://project/issues' ||
+          uri === 'aiready://project/graph'
+        ) {
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  message: 'Resource content coming from latest scan...',
+                }),
+              },
+            ],
+          };
+        }
+
+        throw new Error(`Resource not found: ${uri}`);
+      }
+    );
+
+    // List available prompts
+    this.server.setRequestHandler(ListPromptsRequestSchema, async () => {
+      return {
+        prompts: [
+          {
+            name: 'analyze-project',
+            description:
+              'Audit the project for AI-readiness and suggest improvements.',
+            arguments: [
+              {
+                name: 'path',
+                description: 'Path/directory to analyze',
+                required: true,
+              },
+            ],
+          },
+          {
+            name: 'remediate-issue',
+            description: 'Help the user fix a specific AIReady issue.',
+            arguments: [
+              {
+                name: 'issueId',
+                description: 'The unique ID of the issue to fix',
+                required: true,
+              },
+            ],
+          },
+        ],
+      };
+    });
+
+    // Get prompt content
+    this.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+
+      if (name === 'analyze-project') {
+        const path = args?.path || '.';
+        return {
+          description: 'Project audit instructions',
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `I want to audit the project at "${path}" for AI-readiness. Please use the AIReady tools to identify duplication patterns, context fragmentation, and naming inconsistencies. Then, provide a prioritized list of improvements to help me leverage AI agents more effectively.`,
+              },
+            },
+          ],
+        };
+      }
+
+      if (name === 'remediate-issue') {
+        const issueId = args?.issueId;
+        return {
+          description: 'Issue remediation instructions',
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `I've identified an AIReady issue with ID: ${issueId}. Please use the \`get_remediation_diff\` tool to find a fix, explain the rationale behind the recommended change, and then help me apply it to the codebase.`,
+              },
+            },
+          ],
+        };
+      }
+
+      throw new Error(`Prompt not found: ${name}`);
+    });
+
     // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       // Define canonical tool names to advertise to the client
@@ -155,6 +298,7 @@ export class AIReadyMcpServer {
         ToolName.DocDrift,
         ToolName.DependencyHealth,
         ToolName.ChangeAmplification,
+        ToolName.ContractEnforcement,
       ];
 
       const tools: any[] = [

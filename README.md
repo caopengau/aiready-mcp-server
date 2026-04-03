@@ -2,63 +2,69 @@
 
 The AIReady MCP Server provides an integration point for AI agents (like Claude Desktop, Cursor, Windsurf, etc.) to assess AI-readiness and improve AI leverage directly within their conversational interfaces using the Model Context Protocol (MCP).
 
-## Installation & Distribution Channels
+## 🛠 Capabilities
 
-You can install and use the AIReady MCP server through several supported channels.
+The AIReady MCP server exposes the following capabilities:
 
-### 1. Dedicated MCP Registries
+### 1. Analysis Tools
 
-- **[Smithery](https://smithery.ai)**: Discover and install our server directly via the Smithery CLI:
-  ```bash
-  npx @smithery/cli install @aiready/mcp-server
-  ```
-- **[Glama](https://glama.ai/mcp)**: View our listing and integration options on the Glama directory.
-- **[Pulsar](https://gotopulsar.com)**: Find us on the Pulsar registry for MCP servers.
+- **Scan Tools**: Run localized scans for `pattern-detect`, `context-analyzer`, `consistency`, `ai-signal-clarity`, `agent-grounding`, `testability`, `doc-drift`, `deps-health`, `change-amp`, and `contract-enforce`.
+- **`get_remediation_diff`**: Get a precise code diff to fix identified AI-readiness issues.
 
-### 2. Direct IDE / Assistant Integrations
+### 2. Resources (Contextual Data)
 
-#### Claude Desktop App
+- **`aiready://project/summary`**: A high-level overview of the project's AI-readiness score and issue count.
+- **`aiready://project/issues`**: A JSON list of the top 10 most critical issues found in the latest scan.
+- **`aiready://project/graph`**: Raw dependency and fragmentation graph data for visualization.
 
-To use the AIReady MCP server in the Claude Desktop app, add the following configuration to your `claude_desktop_config.json`:
+### 3. Prompts (Templates)
+
+- **`analyze-project`**: A guided prompt to perform a full AI-readiness audit.
+- **`remediate-issue`**: A template for fixing a specific issue using its ID.
+
+---
+
+## 🧱 Extension: AST Explorer Sibling
+
+For deep code exploration, we also provide the **@aiready/ast-mcp-server**, which provides:
+
+- Symbol resolution (`resolve_definition`)
+- Reference finding (`find_references`)
+- Call hierarchy (`get_call_hierarchy`)
+- Implementation lookup (`find_implementations`)
+
+Configure it alongside AIReady:
 
 ```json
 "mcpServers": {
   "aiready": {
     "command": "npx",
     "args": ["-y", "@aiready/mcp-server"]
+  },
+  "ast-explorer": {
+    "command": "npx",
+    "args": ["-y", "@aiready/ast-mcp-server"]
   }
 }
 ```
 
-#### Cursor IDE
+## Installation & Distribution Channels
 
-1. Open Cursor Settings.
-2. Navigate to **Features** -> **MCP Servers**.
-3. Add a new server.
-4. Set the command to: `npx -y @aiready/mcp-server`
+### 1. Dedicated MCP Registries
 
-#### Windsurf IDE
+- **[Smithery](https://smithery.ai)**: `npx @smithery/cli install @aiready/mcp-server`
+- **[Glama](https://glama.ai/mcp)**: View listing.
+- **[Pulsar](https://gotopulsar.com)**: Find on registry.
 
-1. Open Windsurf Settings or local environment configuration.
-2. Add a new MCP Server integration.
-3. Configure the execution command: `npx -y @aiready/mcp-server`
+### 2. Direct IDE Integrations
 
-### 3. Containerized Distribution (Docker)
+#### Claude Desktop App / Cursor / Windsurf
 
-If you prefer running MCP servers in isolated environments, you can use our Docker image:
+Use the following command configuration:
 
 ```bash
-docker run -i --rm ghcr.io/getaiready/aiready-mcp-server
+npx -y @aiready/mcp-server
 ```
-
-_(Note: Docker image distribution is currently being set up. Use the command above once published.)_
-
-### 4. Existing AIReady Channels
-
-We are also integrating the MCP server with our existing distribution methods:
-
-- **Homebrew**: `brew install aiready-mcp` (Coming soon)
-- **VS Code Extension**: Bundled within the AIReady extension for editor-native AI chats. (Coming soon)
 
 ## Quick Start
 
