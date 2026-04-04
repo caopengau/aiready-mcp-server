@@ -27,6 +27,12 @@ export function registerResourceHandlers(server: any, stateStore: StateStore) {
           description: 'Force-directed graph data for visualization.',
           mimeType: 'application/json',
         },
+        {
+          uri: 'aiready://project/roadmap',
+          name: 'AIReady Readiness Roadmap',
+          description: 'A prioritized plan to reach elite readiness.',
+          mimeType: 'text/markdown',
+        },
       ],
     };
   });
@@ -66,6 +72,18 @@ export function registerResourceHandlers(server: any, stateStore: StateStore) {
             uri,
             mimeType: 'application/json',
             text: stateStore.getGraphJson(),
+          },
+        ],
+      };
+    }
+
+    if (uri === 'aiready://project/roadmap') {
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'text/markdown',
+            text: stateStore.getRoadmapMarkdown(),
           },
         ],
       };

@@ -9,6 +9,12 @@ import {
   handleRemediation,
   ADVERTISED_TOOLS,
   RemediationArgsSchema,
+  BestPracticesArgsSchema,
+  handleGetBestPractices,
+  ComplianceArgsSchema,
+  handleCheckCompliance,
+  ContextBudgetArgsSchema,
+  handleAnalyzeContextBudget,
 } from './tools/index.js';
 import { registerResourceHandlers } from './resources/index.js';
 import { registerPromptHandlers } from './prompts/index.js';
@@ -108,6 +114,21 @@ export class AIReadyMcpServer {
         if (name === 'get_remediation_diff') {
           const parsedArgs = RemediationArgsSchema.parse(args);
           return await handleRemediation(parsedArgs);
+        }
+
+        if (name === 'get_best_practices') {
+          const parsedArgs = BestPracticesArgsSchema.parse(args);
+          return await handleGetBestPractices(parsedArgs);
+        }
+
+        if (name === 'check_best_practice_compliance') {
+          const parsedArgs = ComplianceArgsSchema.parse(args);
+          return await handleCheckCompliance(parsedArgs);
+        }
+
+        if (name === 'analyze_context_budget') {
+          const parsedArgs = ContextBudgetArgsSchema.parse(args);
+          return await handleAnalyzeContextBudget(parsedArgs);
         }
 
         const results = await handleAnalysis(name, args, stateStore);

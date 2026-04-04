@@ -57,6 +57,48 @@ Run the \`aiready-mcp\` tool for a detailed analysis.`;
     return JSON.stringify(this.lastResults.metadata.graph, null, 2);
   }
 
+  getRoadmapMarkdown(): string {
+    if (!this.lastResults) {
+      return '# AIReady Roadmap\n\nNo scan has been run yet. Run an AIReady scan to generate a prioritized roadmap.';
+    }
+
+    const { score, summary, issues } = this.lastResults;
+    const grade = this.calculateGrade(score);
+
+    let roadmap = `# AIReady Roadmap\n\n`;
+    roadmap += `Current Score: **${score}/100 (${grade})**\n\n`;
+
+    roadmap += `## Phase 1: High-Impact Fixes (Readiness Score 90+)\n`;
+    const criticalIssues = issues
+      .filter((i: any) => i.severity === 'critical')
+      .slice(0, 3);
+    if (criticalIssues.length > 0) {
+      criticalIssues.forEach((i: any) => {
+        roadmap += ` - [ ] **Fix ${i.type}** in \`${i.location.file}:L${i.location.line}\`: ${i.message}\n`;
+      });
+    } else {
+      roadmap += ` - ✅ All critical issues resolved!\n`;
+    }
+
+    roadmap += `\n## Phase 2: Structural Optimization (Efficiency)\n`;
+    const majorIssues = issues
+      .filter((i: any) => i.severity === 'major')
+      .slice(0, 3);
+    if (majorIssues.length > 0) {
+      majorIssues.forEach((i: any) => {
+        roadmap += ` - [ ] **Address ${i.type}**: ${i.message} (\`${i.location.file}\`)\n`;
+      });
+    } else {
+      roadmap += ` - ✅ All major structural issues resolved!\n`;
+    }
+
+    roadmap += `\n## Phase 3: Continuous AI Excellence\n`;
+    roadmap += ` - [ ] Implement \`mcp-server\` in CI/CD pipeline.\n`;
+    roadmap += ` - [ ] Achieve consistency score > 95 across all naming patterns.\n`;
+
+    return roadmap;
+  }
+
   private calculateGrade(score: number): string {
     if (score >= 90) return 'A';
     if (score >= 80) return 'B';

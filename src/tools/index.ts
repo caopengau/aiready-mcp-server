@@ -1,5 +1,15 @@
 import { z } from 'zod';
 import { ToolRegistry, ToolName } from '@aiready/core';
+import {
+  handleGetBestPractices,
+  handleCheckCompliance,
+  BestPracticesArgsSchema,
+  ComplianceArgsSchema,
+} from './best-practices.js';
+import {
+  handleAnalyzeContextBudget,
+  ContextBudgetArgsSchema,
+} from './context-budget.js';
 
 /**
  * Zod schemas for tool arguments
@@ -19,6 +29,12 @@ export const RemediationArgsSchema = z.object({
   file_path: z.string().describe('The path to the file containing the issue'),
   context: z.string().describe('The content of the file or surrounding code'),
 });
+
+export {
+  BestPracticesArgsSchema,
+  ComplianceArgsSchema,
+  ContextBudgetArgsSchema,
+};
 
 /**
  * Mapping between tool names and @aiready/ package names.
@@ -72,7 +88,16 @@ export const ADVERTISED_TOOLS = [
   ToolName.PatternEntropy,
   ToolName.ConceptCohesion,
   ToolName.SemanticDistance,
+  'get_best_practices',
+  'check_best_practice_compliance',
+  'analyze_context_budget',
 ];
+
+export {
+  handleGetBestPractices,
+  handleCheckCompliance,
+  handleAnalyzeContextBudget,
+};
 
 export async function handleAnalysis(
   name: string,
