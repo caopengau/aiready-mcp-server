@@ -7,7 +7,9 @@ import {
   TagResourceCommand,
 } from '@aws-sdk/client-organizations';
 
-const orgClient = new OrganizationsClient({ region: 'us-east-1' }); // Organizations API is only in us-east-1
+const orgClient = new OrganizationsClient({
+  region: process.env.AWS_REGION || 'ap-southeast-2',
+});
 
 /**
  * Initiates the creation of a new AWS account specialized for a ClawMore Managed node.

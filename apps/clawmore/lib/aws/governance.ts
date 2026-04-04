@@ -5,7 +5,9 @@ import {
   ListPoliciesCommand,
 } from '@aws-sdk/client-organizations';
 
-const orgClient = new OrganizationsClient({ region: 'us-east-1' });
+const orgClient = new OrganizationsClient({
+  region: process.env.AWS_REGION || 'ap-southeast-2',
+});
 
 const SERVERLESS_SCP_DOCUMENT = {
   Version: '2012-10-17',

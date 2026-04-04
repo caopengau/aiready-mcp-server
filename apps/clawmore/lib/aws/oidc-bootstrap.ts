@@ -69,7 +69,7 @@ export async function bootstrapManagedAccount(
 ) {
   const credentials = await assumeSubAccountRole(accountId);
   const iamClient = new IAMClient({
-    region: 'us-east-1',
+    region: process.env.AWS_REGION || 'ap-southeast-2',
     credentials,
   });
 
