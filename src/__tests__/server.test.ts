@@ -145,6 +145,33 @@ describe('AIReady MCP Server Integration', () => {
     expect(result.contents[0].text).toContain('# AIReady Summary');
   });
 
+  it('should execute get_best_practices', async () => {
+    const result = await client.callTool({
+      name: 'get_best_practices',
+      arguments: { category: 'patterns' },
+    });
+    const typedResult = result as ToolCallResponse;
+    expect(typedResult.content[0].text).toContain('Pattern Detection');
+  });
+
+  it('should execute check_best_practice_compliance', async () => {
+    const result = await client.callTool({
+      name: 'check_best_practice_compliance',
+      arguments: { file_path: path.resolve(__dirname, '../index.ts') },
+    });
+    const typedResult = result as ToolCallResponse;
+    expect(typedResult.content[0].text).toContain('is compliant');
+  });
+
+  it('should execute analyze_context_budget', async () => {
+    const result = await client.callTool({
+      name: 'analyze_context_budget',
+      arguments: { file_path: path.resolve(__dirname, '../index.ts') },
+    });
+    const typedResult = result as ToolCallResponse;
+    expect(typedResult.content[0].text).toContain('Context Budget');
+  });
+
   it('should list available prompts', async () => {
     const result = await client.listPrompts();
     expect(result.prompts).toBeDefined();

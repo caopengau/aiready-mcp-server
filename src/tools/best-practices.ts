@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Actually, it's easier to use a relative path if they are in the same monorepo
 const SKILLS_AGENTS_MD_PATH = path.resolve(
   __dirname,
-  '../../../../skills/aiready-best-practices/AGENTS.md'
+  '../../skills/aiready-best-practices/AGENTS.md'
 );
 
 export const BestPracticesArgsSchema = z.object({
