@@ -142,7 +142,7 @@ describe('AIReady MCP Server Integration', () => {
     });
     expect(result.contents).toBeDefined();
     expect(result.contents[0].uri).toBe('aiready://project/summary');
-    expect(result.contents[0].text).toContain('# AIReady Summary');
+    expect((result.contents[0] as any).text).toContain('# AIReady Summary');
   });
 
   it('should execute get_best_practices', async () => {
