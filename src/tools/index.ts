@@ -56,7 +56,7 @@ export const TOOL_PACKAGE_MAP: Record<string, string> = {
   [ToolName.PatternEntropy]: '@aiready/pattern-entropy',
   [ToolName.ConceptCohesion]: '@aiready/concept-cohesion',
   [ToolName.SemanticDistance]: '@aiready/semantic-distance',
-  [ToolName.MetabolismAudit]: '@aiready/metabolism-audit',
+  [ToolName.HygieneAudit]: '@aiready/hygiene-audit',
   // Aliases
   patterns: '@aiready/pattern-detect',
   duplicates: '@aiready/pattern-detect',
@@ -69,8 +69,12 @@ export const TOOL_PACKAGE_MAP: Record<string, string> = {
   'deps-health': '@aiready/deps',
   'change-amp': '@aiready/change-amplification',
   'contract-enforce': '@aiready/contract-enforcement',
-  metabolism: '@aiready/metabolism-audit',
-  metabolism_audit: '@aiready/metabolism-audit',
+  // Hygiene & Legacy aliases
+  hygiene: '@aiready/hygiene-audit',
+  hygiene_audit: '@aiready/hygiene-audit',
+  metabolism: '@aiready/hygiene-audit',
+  metabolism_audit: '@aiready/hygiene-audit',
+  codebase_audit: '@aiready/hygiene-audit',
 };
 
 /**
@@ -91,11 +95,11 @@ export const ADVERTISED_TOOLS = [
   ToolName.PatternEntropy,
   ToolName.ConceptCohesion,
   ToolName.SemanticDistance,
-  ToolName.MetabolismAudit,
+  ToolName.HygieneAudit,
   'get_best_practices',
   'check_best_practice_compliance',
   'analyze_context_budget',
-  'metabolism_audit',
+  'hygiene_audit',
 ];
 
 export {
