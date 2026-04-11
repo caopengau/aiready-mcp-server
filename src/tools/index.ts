@@ -56,6 +56,7 @@ export const TOOL_PACKAGE_MAP: Record<string, string> = {
   [ToolName.PatternEntropy]: '@aiready/pattern-entropy',
   [ToolName.ConceptCohesion]: '@aiready/concept-cohesion',
   [ToolName.SemanticDistance]: '@aiready/semantic-distance',
+  [ToolName.MetabolismAudit]: '@aiready/metabolism-audit',
   // Aliases
   patterns: '@aiready/pattern-detect',
   duplicates: '@aiready/pattern-detect',
@@ -68,6 +69,7 @@ export const TOOL_PACKAGE_MAP: Record<string, string> = {
   'deps-health': '@aiready/deps',
   'change-amp': '@aiready/change-amplification',
   'contract-enforce': '@aiready/contract-enforcement',
+  metabolism: '@aiready/metabolism-audit',
 };
 
 /**
@@ -88,6 +90,7 @@ export const ADVERTISED_TOOLS = [
   ToolName.PatternEntropy,
   ToolName.ConceptCohesion,
   ToolName.SemanticDistance,
+  ToolName.MetabolismAudit,
   'get_best_practices',
   'check_best_practice_compliance',
   'analyze_context_budget',
