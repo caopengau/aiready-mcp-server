@@ -70,6 +70,7 @@ export const TOOL_PACKAGE_MAP: Record<string, string> = {
   'change-amp': '@aiready/change-amplification',
   'contract-enforce': '@aiready/contract-enforcement',
   metabolism: '@aiready/metabolism-audit',
+  metabolism_audit: '@aiready/metabolism-audit',
 };
 
 /**
@@ -94,6 +95,7 @@ export const ADVERTISED_TOOLS = [
   'get_best_practices',
   'check_best_practice_compliance',
   'analyze_context_budget',
+  'metabolism_audit',
 ];
 
 export {
